@@ -2,7 +2,8 @@
 #include <iostream>
 
 int main() {
-  fnb::Vec3 a(1, 2, 3);
-  std::cout << a.mag2() << '\n';
+  using namespace fnb;
+  constexpr Vec3 a = Vec3{1, 2, 3} + Vec3{4, 5, 6};
+  std::cout << a.x << ' ' << a.y << ' ' << a.z << '\n';
   return 0;
 }

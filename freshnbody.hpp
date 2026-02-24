@@ -4,9 +4,7 @@
 #include <cmath>
 
 namespace fnb {
-
   struct Vec3;
-
   inline constexpr Vec3 operator-(Vec3 a, Vec3 b);
 
   struct Vec3 {
