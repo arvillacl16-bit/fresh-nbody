@@ -1,3 +1,5 @@
 /.vscode
-/builddir
+/build-debug
+/build-release
+build_lib.sh
 .clangd

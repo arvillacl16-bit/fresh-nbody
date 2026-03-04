@@ -12,13 +12,17 @@ A WIP N-body simulator written in C++.
 Just run:
 
 ```sh
-git clone https://github.com/arvillacl16-bit/FreshNBody.git
-cd FreshNBody
-meson setup builddir
+git clone https://github.com/arvillacl16-bit/fresh-nbody.git
+cd fresh-nbody
+meson setup builddir --buildtype=release
 meson compile -C builddir
 ```
 
-The static library should be located at ./builddir/freshnbody.a for Linux/macOS or ./builddir/freshnbody.lib on Windows.
+The static library should be located at ./builddir/freshnbody.a. If you want to install the library system-wide, use:
+
+```sh
+meson install -C builddir
+```
 
 ## Contributing
 
