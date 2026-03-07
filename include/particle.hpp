@@ -16,19 +16,64 @@ namespace fnb {
   class Particle;
   class ConstParticle;
 
-  class ParticleStore {
+  template <typename T> class SyncStore {
   private:
-    size_t N = 0;
+    std::vector<T> data_;
+    const T def_val_{};
 
-    std::vector<Vec3> positions;
-    std::vector<Vec3> velocities;
-    std::vector<Vec3> accelerations;
-    std::vector<double> mus;
-    std::vector<uint64_t> ids;
+    SyncStore() = default;
+    SyncStore(const SyncStore& other) = default;
+    SyncStore(SyncStore&& other) = default;
+    SyncStore& operator=(const SyncStore& other) = default;
+    SyncStore& operator=(SyncStore&& other) = default;
+
+    SyncStore(const std::vector<T>& data) : data_(data) {}
+    SyncStore(size_t N) : data_(N) {}
+
+    void push_back(const T& el) { data_.push_back(el); }
+    void pop_back() { return data_.pop_back(); }
+    void push_back(T&& el) { data_.push_back(el); }
+
+    template <typename... Args> void emplace_back(Args... args) { data_.emplace_back(std::forward<Args>(args)...); }
+
+    void resize(size_t sz) { data_.resize(sz); }
+    void reserve(size_t sz) { data_.reserve(sz); }
 
   public:
+    operator std::vector<T>() const { return data_; }
+
+    T& operator[](size_t idx) { return data_[idx]; }
+    const T& operator[](size_t idx) const { return data_[idx]; }
+
+    T& at(size_t idx) { return data_.at(idx); }
+    const T& at(size_t idx) const { return data_.at(idx); }
+
+    size_t size() { return data_.size(); }
+    size_t capacity() { return data_.capacity(); }
+
+    T& back() { return data_.back(); }
+
+    auto begin() { return data_.begin(); }
+    auto begin() const { return data_.begin(); }
+    auto end() { return data_.end(); }
+    auto end() const { return data_.end(); }
+
+    auto cbegin() const { return data_.cbegin(); }
+    auto cend() const { return data_.cend(); }
+
+    friend class ParticleStore;
+  };
+
+  class ParticleStore {
+  public:
+    SyncStore<Vec3> positions;
+    SyncStore<Vec3> velocities;
+    SyncStore<Vec3> accelerations;
+    SyncStore<double> mus;
+    SyncStore<uint64_t> ids;
+
     ParticleStore() = default;
-    ParticleStore(size_t N_) : N(N_) {}
+    ParticleStore(size_t N) : positions(N), velocities(N), accelerations(N), mus(N), ids(N) {}
 
     void add_particle(const IndParticle& p);
     void add_particles(const std::vector<IndParticle>& ps);
@@ -37,6 +82,8 @@ namespace fnb {
 
     Particle operator[](size_t idx);
     ConstParticle operator[](size_t idx) const;
+
+    size_t N() { return positions.size(); }
 
     friend class Particle;
     friend class ConstParticle;

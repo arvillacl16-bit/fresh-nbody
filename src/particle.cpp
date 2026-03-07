@@ -3,7 +3,7 @@
 
 namespace fnb {
   namespace {
-    template <typename T> void swap_last(std::vector<T>& v, size_t idx) { std::swap(v.back(), v[idx]); }
+    template <typename T> void swap_last(SyncStore<T>& v, size_t idx) { std::swap(v.back(), v[idx]); }
   } // namespace
 
   void ParticleStore::add_particle(const IndParticle& p) {
@@ -12,8 +12,6 @@ namespace fnb {
     accelerations.push_back(p.acc);
     mus.push_back(p.mu);
     ids.push_back(p.id);
-
-    ++N;
   }
 
   void ParticleStore::add_particles(const std::vector<IndParticle>& ps) {
@@ -24,13 +22,9 @@ namespace fnb {
       mus.push_back(p.mu);
       ids.push_back(p.id);
     }
-
-    N += ps.size();
   }
 
   IndParticle ParticleStore::remove_particle(size_t idx) {
-    --N;
-
     swap_last(positions, idx);
     swap_last(velocities, idx);
     swap_last(accelerations, idx);
@@ -79,7 +73,6 @@ namespace fnb {
       res.push_back(p);
     }
 
-    N -= s.size();
     return res;
   }
 } // namespace fnb
