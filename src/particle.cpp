@@ -10,7 +10,7 @@ namespace fnb {
     positions.push_back(p.pos);
     velocities.push_back(p.vel);
     accelerations.push_back(p.acc);
-    masses.push_back(p.mass);
+    mus.push_back(p.mu);
     ids.push_back(p.id);
 
     ++N;
@@ -21,7 +21,7 @@ namespace fnb {
       positions.push_back(p.pos);
       velocities.push_back(p.vel);
       accelerations.push_back(p.acc);
-      masses.push_back(p.mass);
+      mus.push_back(p.mu);
       ids.push_back(p.id);
     }
 
@@ -34,20 +34,20 @@ namespace fnb {
     swap_last(positions, idx);
     swap_last(velocities, idx);
     swap_last(accelerations, idx);
-    swap_last(masses, idx);
+    swap_last(mus, idx);
     swap_last(ids, idx);
 
     IndParticle res;
     res.pos = positions.back();
     res.vel = velocities.back();
     res.acc = accelerations.back();
-    res.mass = masses.back();
+    res.mu = mus.back();
     res.id = ids.back();
 
     positions.pop_back();
     velocities.pop_back();
     accelerations.pop_back();
-    masses.pop_back();
+    mus.pop_back();
     ids.pop_back();
     return res;
   }
@@ -60,20 +60,20 @@ namespace fnb {
       swap_last(positions, idx);
       swap_last(velocities, idx);
       swap_last(accelerations, idx);
-      swap_last(masses, idx);
+      swap_last(mus, idx);
       swap_last(ids, idx);
 
       IndParticle p;
       p.pos = positions.back();
       p.vel = velocities.back();
       p.acc = accelerations.back();
-      p.mass = masses.back();
+      p.mu = mus.back();
       p.id = ids.back();
 
       positions.pop_back();
       velocities.pop_back();
       accelerations.pop_back();
-      masses.pop_back();
+      mus.pop_back();
       ids.pop_back();
 
       res.push_back(p);

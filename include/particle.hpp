@@ -9,7 +9,7 @@ namespace fnb {
     Vec3 pos;
     Vec3 vel;
     Vec3 acc;
-    double mass;
+    double mu;
     uint64_t id;
   };
 
@@ -23,7 +23,7 @@ namespace fnb {
     std::vector<Vec3> positions;
     std::vector<Vec3> velocities;
     std::vector<Vec3> accelerations;
-    std::vector<double> masses;
+    std::vector<double> mus;
     std::vector<uint64_t> ids;
 
   public:
@@ -53,7 +53,7 @@ namespace fnb {
     Vec3& pos() { return ps->positions[idx]; }
     Vec3& vel() { return ps->velocities[idx]; }
     Vec3& acc() { return ps->accelerations[idx]; }
-    double& mass() { return ps->masses[idx]; }
+    double& mass() { return ps->mus[idx]; }
     uint64_t& id() { return ps->ids[idx]; }
 
     operator ConstParticle();
@@ -70,7 +70,7 @@ namespace fnb {
     Vec3 pos() { return ps->positions[idx]; }
     Vec3 vel() { return ps->velocities[idx]; }
     Vec3 acc() { return ps->accelerations[idx]; }
-    double mass() { return ps->masses[idx]; }
+    double mu() { return ps->mus[idx]; }
     uint64_t id() { return ps->ids[idx]; }
   };
 

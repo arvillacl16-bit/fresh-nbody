@@ -2,4 +2,5 @@
 /build-debug
 /build-release
 build_lib.sh
+nuke.sh
 .clangd
