@@ -1,9 +1,9 @@
 #include "vec.hpp"
-#include <iostream>
+#include <gtest/gtest.h>
 
-int main() {
+TEST(Vec3Test, 1) {
   using namespace fnb;
-  constexpr Vec3 a = Vec3{1, 2, 3} + Vec3{4, 5, 6};
-  std::cout << a.x << ' ' << a.y << ' ' << a.z << '\n';
-  return 0;
+  Vec3 a{1, 2, 3};
+  Vec3 b{4, 5, 6};
+  ASSERT_EQ(a + b, (Vec3{5, 7, 9}));
 }
