@@ -44,40 +44,40 @@ namespace fnb {
 
   class Particle {
   private:
-    ParticleStore* ps = nullptr;
-    size_t idx = 0;
+    ParticleStore* ps_ = nullptr;
+    size_t idx_ = 0;
 
   public:
-    Particle(ParticleStore& ps_, size_t idx_) : ps(&ps_), idx(idx_) {}
+    Particle(ParticleStore& ps, size_t idx) : ps_(&ps), idx_(idx) {}
 
-    Vec3& pos() { return ps->positions[idx]; }
-    Vec3& vel() { return ps->velocities[idx]; }
-    Vec3& acc() { return ps->accelerations[idx]; }
-    double& mass() { return ps->mus[idx]; }
-    uint64_t& id() { return ps->ids[idx]; }
+    Vec3& pos() { return ps_->positions[idx_]; }
+    Vec3& vel() { return ps_->velocities[idx_]; }
+    Vec3& acc() { return ps_->accelerations[idx_]; }
+    double& mass() { return ps_->mus[idx_]; }
+    uint64_t& id() { return ps_->ids[idx_]; }
 
     operator ConstParticle();
   };
 
   class ConstParticle {
   private:
-    const ParticleStore* ps = nullptr;
-    size_t idx = 0;
+    const ParticleStore* ps_ = nullptr;
+    size_t idx_ = 0;
 
   public:
-    ConstParticle(const ParticleStore& ps_, size_t idx_) : ps(&ps_), idx(idx_) {}
+    ConstParticle(const ParticleStore& ps, size_t idx) : ps_(&ps), idx_(idx) {}
 
-    Vec3 pos() const { return ps->positions[idx]; }
-    Vec3 vel() const { return ps->velocities[idx]; }
-    Vec3 acc() const { return ps->accelerations[idx]; }
-    double mu() const { return ps->mus[idx]; }
-    uint64_t id() const { return ps->ids[idx]; }
+    Vec3 pos() const { return ps_->positions[idx_]; }
+    Vec3 vel() const { return ps_->velocities[idx_]; }
+    Vec3 acc() const { return ps_->accelerations[idx_]; }
+    double mu() const { return ps_->mus[idx_]; }
+    uint64_t id() const { return ps_->ids[idx_]; }
   };
 
   inline Particle ParticleStore::operator[](size_t idx) { return Particle(*this, idx); }
   inline ConstParticle ParticleStore::operator[](size_t idx) const { return ConstParticle(*this, idx); }
 
-  inline Particle::operator ConstParticle() { return ConstParticle(*ps, idx); }
+  inline Particle::operator ConstParticle() { return ConstParticle(*ps_, idx_); }
 } // namespace fnb
 
 #endif
