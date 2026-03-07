@@ -63,7 +63,12 @@ namespace fnb {
       swap_last(masses, idx);
       swap_last(ids, idx);
 
-      IndParticle p{.pos = positions.back(), .vel = velocities.back(), .acc = accelerations.back(), .mass = masses.back(), .id = ids.back()};
+      IndParticle p;
+      p.pos = positions.back();
+      p.vel = velocities.back();
+      p.acc = accelerations.back();
+      p.mass = masses.back();
+      p.id = ids.back();
 
       positions.pop_back();
       velocities.pop_back();
