@@ -1,4 +1,4 @@
-#include "freshnbody.hpp"
+#include "vec.hpp"
 #include <iostream>
 
 int main() {
