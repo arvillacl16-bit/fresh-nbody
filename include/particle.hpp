@@ -67,11 +67,11 @@ namespace fnb {
   public:
     ConstParticle(const ParticleStore& ps_, size_t idx_) : ps(&ps_), idx(idx_) {}
 
-    Vec3 pos() { return ps->positions[idx]; }
-    Vec3 vel() { return ps->velocities[idx]; }
-    Vec3 acc() { return ps->accelerations[idx]; }
-    double mu() { return ps->mus[idx]; }
-    uint64_t id() { return ps->ids[idx]; }
+    Vec3 pos() const { return ps->positions[idx]; }
+    Vec3 vel() const { return ps->velocities[idx]; }
+    Vec3 acc() const { return ps->accelerations[idx]; }
+    double mu() const { return ps->mus[idx]; }
+    uint64_t id() const { return ps->ids[idx]; }
   };
 
   inline Particle ParticleStore::operator[](size_t idx) { return Particle(*this, idx); }
