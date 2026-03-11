@@ -100,10 +100,19 @@ namespace fnb {
     Vec3& pos() { return ps_->positions[idx_]; }
     Vec3& vel() { return ps_->velocities[idx_]; }
     Vec3& acc() { return ps_->accelerations[idx_]; }
-    double& mass() { return ps_->mus[idx_]; }
+    double& mu() { return ps_->mus[idx_]; }
     uint64_t& id() { return ps_->ids[idx_]; }
 
     operator ConstParticle();
+    operator IndParticle() {
+      IndParticle res;
+      res.pos = pos();
+      res.vel = vel();
+      res.acc = acc();
+      res.mu = mu();
+      res.id = id();
+      return res;
+    }
   };
 
   class ConstParticle {
@@ -119,6 +128,15 @@ namespace fnb {
     Vec3 acc() const { return ps_->accelerations[idx_]; }
     double mu() const { return ps_->mus[idx_]; }
     uint64_t id() const { return ps_->ids[idx_]; }
+    operator IndParticle() {
+      IndParticle res;
+      res.pos = pos();
+      res.vel = vel();
+      res.acc = acc();
+      res.mu = mu();
+      res.id = id();
+      return res;
+    }
   };
 
   inline Particle ParticleStore::operator[](size_t idx) { return Particle(*this, idx); }
