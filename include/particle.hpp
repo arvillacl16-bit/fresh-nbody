@@ -28,7 +28,11 @@ namespace fnb {
     SyncStore& operator=(SyncStore&& other) = default;
 
     SyncStore(const std::vector<T>& data) : data_(data) {}
+    SyncStore(const std::vector<T>& data, const T& def_val) : data_(data), def_val_(def_val) {}
     SyncStore(size_t N) : data_(N) {}
+    SyncStore(size_t N, const T& def_val) : data_(N), def_val_(def_val) {}
+
+    template <typename... Args> SyncStore(Args... args) : def_val_(std::forward<Args>(args)...) {}
 
     void push_back(const T& el) { data_.push_back(el); }
     void pop_back() { return data_.pop_back(); }
@@ -40,7 +44,7 @@ namespace fnb {
     void reserve(size_t sz) { data_.reserve(sz); }
 
   public:
-    operator std::vector<T>() const { return data_; }
+    operator const std::vector<T>&() const { return data_; }
 
     T& operator[](size_t idx) { return data_[idx]; }
     const T& operator[](size_t idx) const { return data_[idx]; }
