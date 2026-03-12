@@ -22,10 +22,6 @@ namespace fnb {
     const T def_val_{};
 
     SyncStore() = default;
-    SyncStore(const SyncStore& other) = default;
-    SyncStore(SyncStore&& other) = default;
-    SyncStore& operator=(const SyncStore& other) = default;
-    SyncStore& operator=(SyncStore&& other) = default;
 
     SyncStore(const std::vector<T>& data) : data_(data) {}
     SyncStore(const std::vector<T>& data, const T& def_val) : data_(data), def_val_(def_val) {}
