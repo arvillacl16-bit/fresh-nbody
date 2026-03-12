@@ -32,13 +32,13 @@ namespace fnb {
     SyncStore(size_t N) : data_(N) {}
     SyncStore(size_t N, const T& def_val) : data_(N), def_val_(def_val) {}
 
-    template <typename... Args> SyncStore(Args... args) : def_val_(std::forward<Args>(args)...) {}
+    template <typename... Args> SyncStore(Args&&... args) : def_val_(std::forward<Args>(args)...) {}
 
     void push_back(const T& el) { data_.push_back(el); }
     void pop_back() { return data_.pop_back(); }
     void push_back(T&& el) { data_.push_back(el); }
 
-    template <typename... Args> void emplace_back(Args... args) { data_.emplace_back(std::forward<Args>(args)...); }
+    template <typename... Args> void emplace_back(Args&&... args) { data_.emplace_back(std::forward<Args>(args)...); }
 
     void resize(size_t sz) { data_.resize(sz); }
     void reserve(size_t sz) { data_.reserve(sz); }
