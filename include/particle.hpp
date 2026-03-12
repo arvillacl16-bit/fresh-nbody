@@ -48,8 +48,8 @@ namespace fnb {
     T& at(size_t idx) { return data_.at(idx); }
     const T& at(size_t idx) const { return data_.at(idx); }
 
-    size_t size() { return data_.size(); }
-    size_t capacity() { return data_.capacity(); }
+    size_t size() const { return data_.size(); }
+    size_t capacity() const { return data_.capacity(); }
 
     T& back() { return data_.back(); }
 
@@ -102,9 +102,14 @@ namespace fnb {
     Vec3& acc() { return ps_->accelerations[idx_]; }
     double& mu() { return ps_->mus[idx_]; }
     uint64_t& id() { return ps_->ids[idx_]; }
+    Vec3 pos() const { return ps_->positions[idx_]; }
+    Vec3 vel() const { return ps_->velocities[idx_]; }
+    Vec3 acc() const { return ps_->accelerations[idx_]; }
+    double mu() const { return ps_->mus[idx_]; }
+    uint64_t id() const { return ps_->ids[idx_]; }
 
-    operator ConstParticle();
-    operator IndParticle() {
+    operator ConstParticle() const;
+    operator IndParticle() const {
       IndParticle res;
       res.pos = pos();
       res.vel = vel();
@@ -128,7 +133,7 @@ namespace fnb {
     Vec3 acc() const { return ps_->accelerations[idx_]; }
     double mu() const { return ps_->mus[idx_]; }
     uint64_t id() const { return ps_->ids[idx_]; }
-    operator IndParticle() {
+    operator IndParticle() const {
       IndParticle res;
       res.pos = pos();
       res.vel = vel();
@@ -142,7 +147,7 @@ namespace fnb {
   inline Particle ParticleStore::operator[](size_t idx) { return Particle(*this, idx); }
   inline ConstParticle ParticleStore::operator[](size_t idx) const { return ConstParticle(*this, idx); }
 
-  inline Particle::operator ConstParticle() { return ConstParticle(*ps_, idx_); }
+  inline Particle::operator ConstParticle() const { return ConstParticle(*ps_, idx_); }
 } // namespace fnb
 
 #endif

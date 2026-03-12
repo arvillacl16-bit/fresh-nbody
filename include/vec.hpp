@@ -48,7 +48,7 @@ namespace fnb {
     [[nodiscard]] inline double dist(Vec3 other) const { return std::sqrt(dist2(other)); }
     [[nodiscard]] inline constexpr bool almost_eq(Vec3 other, double thres = 1e-9) const { return dist2(other) < thres * thres; }
 
-    [[nodiscard]] inline constexpr Vec3 cross(Vec3 other) {
+    [[nodiscard]] inline constexpr Vec3 cross(Vec3 other) const {
       return {y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x};
     }
 
