@@ -1,6 +1,5 @@
 /.vscode
-/build-debug
+/build
 /build-release
-build_lib.sh
-nuke.sh
-.clangd
+build.sh
+setup.sh
