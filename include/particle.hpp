@@ -2,6 +2,8 @@
 #define FRESHNBODY_HPP_
 
 #include "vec.hpp"
+#include <cstdint>
+#include <stdexcept>
 #include <vector>
 
 namespace fnb {
@@ -64,13 +66,56 @@ namespace fnb {
     friend class ParticleStore;
   };
 
+  template <typename T>
+  using VecMap = std::vector<std::pair<std::string_view, SyncStore<T>>>;
+
   class ParticleStore {
+  private:
+    VecMap<double> extra_params_dbl_;
+    VecMap<Vec3> extra_params_vec_;
+    VecMap<uint64_t> extra_params_int_;
+    VecMap<void*> extra_params_ptr_;
+
   public:
     SyncStore<Vec3> positions;
     SyncStore<Vec3> velocities;
     SyncStore<Vec3> accelerations;
     SyncStore<double> mus;
     SyncStore<uint64_t> ids;
+
+    template <typename T> SyncStore<T>& get(std::string_view) { static_assert(false, "Invalid type"); }
+
+    template<> SyncStore<double>& get<double>(std::string_view param_name) {
+      auto& extra_params = extra_params_dbl_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<double>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
+
+    template<> SyncStore<Vec3>& get<Vec3>(std::string_view param_name) {
+      auto& extra_params = extra_params_vec_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<Vec3>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
+
+    template<> SyncStore<uint64_t>& get<uint64_t>(std::string_view param_name) {
+      auto& extra_params = extra_params_int_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<uint64_t>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
+
+    template<> SyncStore<void*>& get<void*>(std::string_view param_name) {
+      auto& extra_params = extra_params_ptr_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<void*>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
 
     ParticleStore() = default;
     ParticleStore(size_t N) : positions(N), velocities(N), accelerations(N), mus(N), ids(N) {}
@@ -83,7 +128,7 @@ namespace fnb {
     Particle operator[](size_t idx);
     ConstParticle operator[](size_t idx) const;
 
-    size_t N() { return positions.size(); }
+    size_t N() { return positions.size(); } 
 
     friend class Particle;
     friend class ConstParticle;
