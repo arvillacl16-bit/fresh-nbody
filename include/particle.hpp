@@ -21,7 +21,7 @@ namespace fnb {
   template <typename T> class SyncStore {
   private:
     std::vector<T> data_;
-    const T def_val_{};
+    T def_val_{};
 
     SyncStore() = default;
 
@@ -119,6 +119,11 @@ namespace fnb {
 
     ParticleStore() = default;
     ParticleStore(size_t N) : positions(N), velocities(N), accelerations(N), mus(N), ids(N) {}
+
+    ParticleStore(const ParticleStore&) = default;
+    ParticleStore(ParticleStore&&) = default;
+    ParticleStore& operator=(const ParticleStore&) = default;
+    ParticleStore& operator=(ParticleStore&&) = default;
 
     void add_particle(const IndParticle& p);
     void add_particles(const std::vector<IndParticle>& ps);

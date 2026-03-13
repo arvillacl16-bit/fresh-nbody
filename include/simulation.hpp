@@ -16,6 +16,7 @@ namespace fnb {
     double t_;
 
     ParticleStore particles_;
+    ParticleStore particles_test_;
 
   public:
     double dt;
@@ -27,6 +28,11 @@ namespace fnb {
     Mercurius mercurius;
 
     Simulation();
+    Simulation(const Simulation&);
+    Simulation(Simulation&&) noexcept;
+    Simulation& operator=(const Simulation&);
+    Simulation& operator=(Simulation&&) noexcept;
+    ~Simulation();
   };
 } // namespace fnb
 
