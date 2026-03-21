@@ -84,6 +84,7 @@ namespace fnb {
     SyncStore<uint64_t> ids;
 
     template <typename T> SyncStore<T>& get(std::string_view) { static_assert(false, "Invalid type"); }
+    template <typename T> const SyncStore<T>& get(std::string_view) const { static_assert(false, "Invalid type"); }
 
     template<> SyncStore<double>& get<double>(std::string_view param_name) {
       auto& extra_params = extra_params_dbl_;
@@ -116,6 +117,38 @@ namespace fnb {
           it != extra_params.end()) return it->second;
       else throw std::invalid_argument("Parameter not found");
     }
+    template<> const SyncStore<double>& get<double>(std::string_view param_name) const {
+      auto& extra_params = extra_params_dbl_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<double>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
+
+    template<> const SyncStore<Vec3>& get<Vec3>(std::string_view param_name) const {
+      auto& extra_params = extra_params_vec_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<Vec3>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
+
+    template<> const SyncStore<uint64_t>& get<uint64_t>(std::string_view param_name) const {
+      auto& extra_params = extra_params_int_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<uint64_t>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
+
+    template<> const SyncStore<void*>& get<void*>(std::string_view param_name) const {
+      auto& extra_params = extra_params_ptr_;
+      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
+          [param_name](const std::pair<std::string_view, SyncStore<void*>>& el) { return el.first == param_name; }); 
+          it != extra_params.end()) return it->second;
+      else throw std::invalid_argument("Parameter not found");
+    }
+
 
     ParticleStore() = default;
     ParticleStore(size_t N) : positions(N), velocities(N), accelerations(N), mus(N), ids(N) {}
