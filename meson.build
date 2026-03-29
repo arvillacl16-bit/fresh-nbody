@@ -3,7 +3,7 @@ project('FreshNBody', 'cpp', version : '0.1.0', default_options : ['cpp_std=c++1
 gtest_dep = dependency('gtest', required : false)
 gtest_main_dep = dependency('gtest_main', required : false)
 
-source_files = files('src/particle.cpp')
+source_files = files('src/particle.cpp', 'src/leapfrog.cpp', 'src/simulation.cpp', 'src/accel.cpp')
 
 inc = include_directories('include')
 
@@ -11,7 +11,8 @@ lib_freshnbody = static_library('freshnbody', source_files, include_directories 
 
 if gtest_dep.found()
   test_files = {
-    'test1': 'test1.cpp'
+    'test1': 'test1.cpp',
+    'leapfrog-basic': 'leapfrog-basic.cpp'
   }
 
   foreach test_name, test_file : test_files
