@@ -14,7 +14,7 @@ Just run:
 ```sh
 git clone https://github.com/arvillacl16-bit/fresh-nbody.git
 cd fresh-nbody
-meson setup builddir --buildtype=release
+meson setup builddir --buildtype=release -Dbuild-tests=false
 meson compile -C builddir
 ```
 
