@@ -1,6 +1,6 @@
 # FreshNBody
 
-A WIP N-body simulator written in C++.
+A WIP N-body simulator written in C++, which will support various different integrators.
 
 ## Dependencies
 
@@ -26,4 +26,9 @@ meson install -C builddir
 
 ## Contributing
 
-Because this project is linked to a youtube video series, I will not accept pull requests.
+Because this project is linked to a youtube video series, pull requests will be reviewed on video. You are free to make issues or suggestions, though.
+
+## License
+
+This uses an LGPL 3.0 license.
+
