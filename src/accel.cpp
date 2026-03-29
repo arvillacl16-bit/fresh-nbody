@@ -14,7 +14,7 @@ namespace fnb::accel {
     auto& accelerations_test = particles_test.accelerations;
 
     for (size_t i = 0; i < N; ++i) {
-      for (size_t j = i; j < N; ++j) {
+      for (size_t j = i + 1; j < N; ++j) {
         Vec3 dp = positions[i] - positions[j];
         double r = dp.mag(); 
         double inv_r3 =  1. / (r * r * r);
