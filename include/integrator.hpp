@@ -12,22 +12,22 @@ namespace fnb {
     GravityMethod gravity = GravityMethod::BASIC;
     double epsilon = 1e-12;
 
-    void step(ParticleStore& particles, ParticleStore& particles_test, double dt);
+    void step(ParticleStore& particles, double dt);
   };
 
   class WHFast {
   public:
-    void step(ParticleStore& particles, ParticleStore& particles_test, double dt);
+    void step(ParticleStore& particles, double dt);
   };
 
   class IAS15 {
   public:
-    void step(ParticleStore& particles, ParticleStore& particles_test, double dt);
+    void step(ParticleStore& particles, double dt);
   };
 
   class Mercurius {
   public:
-    void step(ParticleStore& particles, ParticleStore& particles_test, double dt);
+    void step(ParticleStore& particles, double dt);
   };
 } // namespace fnb
 

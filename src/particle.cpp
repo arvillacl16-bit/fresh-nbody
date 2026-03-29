@@ -9,7 +9,7 @@ namespace fnb {
   void ParticleStore::add_particle(const IndParticle& p) {
     positions.push_back(p.pos);
     velocities.push_back(p.vel);
-    accelerations.push_back(p.acc);
+    accelerations.push_back({0, 0, 0});
     mus.push_back(p.mu);
     ids.push_back(p.id);
   }
@@ -18,7 +18,7 @@ namespace fnb {
     for (const auto& p : ps) {
       positions.push_back(p.pos);
       velocities.push_back(p.vel);
-      accelerations.push_back(p.acc);
+      accelerations.push_back({0, 0, 0});
       mus.push_back(p.mu);
       ids.push_back(p.id);
     }
@@ -34,7 +34,6 @@ namespace fnb {
     IndParticle res;
     res.pos = positions.back();
     res.vel = velocities.back();
-    res.acc = accelerations.back();
     res.mu = mus.back();
     res.id = ids.back();
 
@@ -60,7 +59,6 @@ namespace fnb {
       IndParticle p;
       p.pos = positions.back();
       p.vel = velocities.back();
-      p.acc = accelerations.back();
       p.mu = mus.back();
       p.id = ids.back();
 
