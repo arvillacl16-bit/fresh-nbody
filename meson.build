@@ -22,7 +22,8 @@ if gtest_dep.found()
       include_directories : inc,
       link_with : lib_freshnbody,
       dependencies : gtest_main_dep,
-      install : false
+      install : false,
+      override_options : ['cpp_std=c++20'] 
     )
 
     test(test_name, test_exe)
