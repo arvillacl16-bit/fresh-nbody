@@ -5,7 +5,7 @@
 #include <cstdint>
 
 namespace fnb {
-  enum class GravityMethod : uint8_t { BASIC };
+  enum class GravityMethod : uint8_t { NONE, BASIC, JACOBI, COMPENSATED };
   
   class Leapfrog {
   public:

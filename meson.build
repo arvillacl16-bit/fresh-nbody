@@ -13,7 +13,8 @@ if do_unit_tests
 
   test_files = {
     'test1': 'test1.cpp',
-    'leapfrog-basic': 'leapfrog-basic.cpp'
+    'leapfrog-basic': 'leapfrog-basic.cpp',
+    'leapfrog-compensated': 'leapfrog-compensated.cpp'
   }
 
   foreach test_name, test_file : test_files

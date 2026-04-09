@@ -16,7 +16,19 @@ namespace fnb {
 #pragma omp parallel for
     for (size_t i = 0; i < N; ++i) positions[i] += velocities[i] * (dt / 2);
     
-    accel::basic(particles, epsilon);
+    switch (gravity) {
+    case GravityMethod::BASIC:
+      accel::basic(particles, epsilon * epsilon);
+      break;
+    case GravityMethod::COMPENSATED:
+      accel::compensated(particles, epsilon * epsilon);
+      break;
+    case GravityMethod::JACOBI:
+      accel::jacobi(particles, epsilon * epsilon);
+      break;
+    default:
+      break;
+    }
 
 #pragma omp parallel for
     for (size_t i = 0; i < N; ++i) velocities[i] += accelerations[i] * dt;
