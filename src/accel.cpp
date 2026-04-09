@@ -42,7 +42,7 @@ namespace fnb::accel {
       Vec3 sum;
       Vec3 c;
       for (size_t j = 0; j < test_thres; ++j) {
-        if (i == j) break;
+        if (i == j) continue;
 
         Vec3 dp = positions[i] - positions[j];
         double r = dp.mag();
