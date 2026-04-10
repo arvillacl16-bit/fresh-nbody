@@ -21,7 +21,7 @@ namespace fnb {
 
   class BadOptionalAccess : public std::exception {
   public:
-    virtual const char* what() const noexcept {
+    const char* what() const noexcept override {
       return "Invalid access";
     }
   };
@@ -169,7 +169,13 @@ namespace fnb {
 
     void push_back_test(const T& el) {
       if (!test_thres_) test_thres_ = data_.size();
-    } 
+      data_.push_back(el);
+    }
+
+    void push_back_test(T&& el) {
+      if (!test_thres_) test_thres_ = data_.size();
+      data_.push_back(el);
+    }
 
     void resize(size_t sz) { data_.resize(sz); }
     void reserve(size_t sz) { data_.reserve(sz); }
