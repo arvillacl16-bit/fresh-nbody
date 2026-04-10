@@ -12,8 +12,8 @@ namespace fnb {
   Simulation& Simulation::operator=(Simulation&&) noexcept = default;
 
   Simulation::Simulation(const Simulation& other)
-    : pimpl_(std::make_unique<Impl>()), t_(other.t_), particles_(other.particles_), particles_test_(other.particles_test_),
-      dt(other.dt), config(other.config) {
+      : pimpl_(std::make_unique<Impl>()), t_(other.t_), particles_(other.particles_), particles_test_(other.particles_test_), dt(other.dt),
+        config(other.config) {
     pimpl_->id_map = other.pimpl_->id_map;
   }
 
@@ -30,4 +30,4 @@ namespace fnb {
     pimpl_->id_map = other.pimpl_->id_map;
     return *this;
   }
-}
+} // namespace fnb

@@ -73,4 +73,91 @@ namespace fnb {
 
     return res;
   }
+  template <> SyncStore<double>& ParticleStore::get<double>(std::string_view param_name) {
+    auto& extra_params = extra_params_dbl_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<double>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
+
+  template <> SyncStore<Vec3>& ParticleStore::get<Vec3>(std::string_view param_name) {
+    auto& extra_params = extra_params_vec_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<Vec3>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
+
+  template <> SyncStore<uint64_t>& ParticleStore::get<uint64_t>(std::string_view param_name) {
+    auto& extra_params = extra_params_int_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<uint64_t>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
+
+  template <> SyncStore<void*>& ParticleStore::get<void*>(std::string_view param_name) {
+    auto& extra_params = extra_params_ptr_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<void*>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
+
+  template <> const SyncStore<double>& ParticleStore::get<double>(std::string_view param_name) const {
+    auto& extra_params = extra_params_dbl_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<double>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
+
+  template <> const SyncStore<Vec3>& ParticleStore::get<Vec3>(std::string_view param_name) const {
+    auto& extra_params = extra_params_vec_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<Vec3>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
+
+  template <> const SyncStore<uint64_t>& ParticleStore::get<uint64_t>(std::string_view param_name) const {
+    auto& extra_params = extra_params_int_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<uint64_t>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
+
+  template <> const SyncStore<void*>& ParticleStore::get<void*>(std::string_view param_name) const {
+    auto& extra_params = extra_params_ptr_;
+    if (auto it = std::find_if(
+            extra_params.begin(), extra_params.end(),
+            [param_name](const std::pair<std::string_view, SyncStore<void*>>& el) { return el.first == param_name; });
+        it != extra_params.end())
+      return it->second;
+    else
+      throw std::invalid_argument("Parameter not found");
+  }
 } // namespace fnb

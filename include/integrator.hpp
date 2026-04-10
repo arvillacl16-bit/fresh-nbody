@@ -6,7 +6,7 @@
 
 namespace fnb {
   enum class GravityMethod : uint8_t { NONE, BASIC, JACOBI, COMPENSATED };
-  
+
   class Leapfrog {
   public:
     GravityMethod gravity = GravityMethod::BASIC;

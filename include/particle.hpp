@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <exception>
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 
 namespace fnb {
@@ -21,9 +22,7 @@ namespace fnb {
 
   class BadOptionalAccess : public std::exception {
   public:
-    const char* what() const noexcept override {
-      return "Invalid access";
-    }
+    const char* what() const noexcept override { return "Invalid access"; }
   };
 
   class OptIndex {
@@ -206,8 +205,7 @@ namespace fnb {
     friend class ParticleStore;
   };
 
-  template <typename T>
-  using VecMap = std::vector<std::pair<std::string_view, SyncStore<T>>>;
+  template <typename T> using VecMap = std::vector<std::pair<std::string_view, SyncStore<T>>>;
 
   class ParticleStore {
   private:
@@ -223,72 +221,8 @@ namespace fnb {
     SyncStore<double> mus;
     SyncStore<uint64_t> ids;
 
-    template <typename T> SyncStore<T>& get(std::string_view) { static_assert(false, "Invalid type"); }
-    template <typename T> const SyncStore<T>& get(std::string_view) const { static_assert(false, "Invalid type"); }
-
-    template<> SyncStore<double>& get<double>(std::string_view param_name) {
-      auto& extra_params = extra_params_dbl_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<double>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-
-    template<> SyncStore<Vec3>& get<Vec3>(std::string_view param_name) {
-      auto& extra_params = extra_params_vec_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<Vec3>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-
-    template<> SyncStore<uint64_t>& get<uint64_t>(std::string_view param_name) {
-      auto& extra_params = extra_params_int_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<uint64_t>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-
-    template<> SyncStore<void*>& get<void*>(std::string_view param_name) {
-      auto& extra_params = extra_params_ptr_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<void*>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-    template<> const SyncStore<double>& get<double>(std::string_view param_name) const {
-      auto& extra_params = extra_params_dbl_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<double>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-
-    template<> const SyncStore<Vec3>& get<Vec3>(std::string_view param_name) const {
-      auto& extra_params = extra_params_vec_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<Vec3>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-
-    template<> const SyncStore<uint64_t>& get<uint64_t>(std::string_view param_name) const {
-      auto& extra_params = extra_params_int_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<uint64_t>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-
-    template<> const SyncStore<void*>& get<void*>(std::string_view param_name) const {
-      auto& extra_params = extra_params_ptr_;
-      if (auto it = std::find_if(extra_params.begin(), extra_params.end(), 
-          [param_name](const std::pair<std::string_view, SyncStore<void*>>& el) { return el.first == param_name; }); 
-          it != extra_params.end()) return it->second;
-      else throw std::invalid_argument("Parameter not found");
-    }
-
+    template <typename T> SyncStore<T>& get(std::string_view) { static_assert(sizeof(T) == 0, "Invalid type"); }
+    template <typename T> const SyncStore<T>& get(std::string_view) const { static_assert(sizeof(T) == 0, "Invalid type"); }
 
     ParticleStore() = default;
     ParticleStore(size_t N) : positions(N), velocities(N), accelerations(N), mus(N), ids(N) {}
@@ -306,11 +240,20 @@ namespace fnb {
     Particle operator[](size_t idx);
     ConstParticle operator[](size_t idx) const;
 
-    size_t N() { return positions.size(); } 
+    size_t N() { return positions.size(); }
 
     friend class Particle;
     friend class ConstParticle;
   };
+
+  template <> SyncStore<double>& ParticleStore::get(std::string_view);
+  template <> SyncStore<Vec3>& ParticleStore::get(std::string_view);
+  template <> SyncStore<void*>& ParticleStore::get(std::string_view);
+  template <> SyncStore<uint64_t>& ParticleStore::get(std::string_view);
+  template <> const SyncStore<double>& ParticleStore::get(std::string_view) const;
+  template <> const SyncStore<Vec3>& ParticleStore::get(std::string_view) const;
+  template <> const SyncStore<void*>& ParticleStore::get(std::string_view) const;
+  template <> const SyncStore<uint64_t>& ParticleStore::get(std::string_view) const;
 
   class Particle {
   private:

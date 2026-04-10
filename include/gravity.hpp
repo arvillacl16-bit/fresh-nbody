@@ -6,6 +6,6 @@ namespace fnb::accel {
   void basic(ParticleStore& particles, double epsilon2);
   void jacobi(ParticleStore& particles, double epsilon2);
   void compensated(ParticleStore& particles, double epsilon2);
-}
+} // namespace fnb::accel
 
 #endif
