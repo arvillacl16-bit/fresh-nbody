@@ -6,10 +6,17 @@ inc = include_directories('include')
 
 lib_freshnbody = static_library('freshnbody', source_files, include_directories : inc, install : true)
 
+freshnbody_dep = declare_dependency(
+  include_directories : inc,
+  link_with : lib_freshnbody
+)
+
 do_unit_tests = get_option('build-tests')
 
+install_subdir('include', install_dir : join_paths(get_option('includedir'), 'freshnbody'), strip_directory : true)
+
 if do_unit_tests
-  gtest_main_dep = dependency('gtest_main')
+  gtest_main_dep = dependency('gtest_main', fallback : ['gtest', 'gtest_main_dep'])
 
   test_files = {
     'test1': 'test1.cpp',
