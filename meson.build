@@ -4,7 +4,7 @@ source_files = files('src/particle.cpp', 'src/leapfrog.cpp', 'src/simulation.cpp
 
 inc = include_directories('include')
 
-lib_freshnbody = static_library('freshnbody', source_files, include_directories : inc, install : true)
+lib_freshnbody = library('freshnbody', source_files, include_directories : inc, install : true)
 
 freshnbody_dep = declare_dependency(
   include_directories : inc,
