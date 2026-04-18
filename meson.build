@@ -13,6 +13,14 @@ freshnbody_dep = declare_dependency(
   link_with : lib_freshnbody
 )
 
+pkg = import('pkgconfig')
+pkg.generate(
+  lib_freshnbody,
+  name : 'freshnbody',
+  description: 'simulation library',
+  subdirs: 'freshnbody'
+)
+
 do_unit_tests = get_option('build-tests')
 
 install_subdir('include', install_dir : join_paths(get_option('includedir'), 'freshnbody'), strip_directory : true)
