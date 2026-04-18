@@ -1,10 +1,12 @@
 project('FreshNBody', 'cpp', version : '0.1.0', default_options : ['cpp_std=c++17', 'warning_level=3'])
 
+omp_dep = dependency('openmp')
+
 source_files = files('src/particle.cpp', 'src/leapfrog.cpp', 'src/simulation.cpp', 'src/accel.cpp')
 
 inc = include_directories('include')
 
-lib_freshnbody = library('freshnbody', source_files, include_directories : inc, install : true)
+lib_freshnbody = library('freshnbody', source_files, dependencies : omp_dep, include_directories : inc, install : true)
 
 freshnbody_dep = declare_dependency(
   include_directories : inc,
