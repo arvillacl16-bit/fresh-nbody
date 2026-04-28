@@ -22,7 +22,6 @@ namespace fnb {
     struct Impl;
     std::unique_ptr<Impl> pimpl_;
 
-    
     double t_;
 
     ParticleStore particles_;
@@ -37,7 +36,7 @@ namespace fnb {
         IAS15 ias15_;
         Mercurius mercurius_;
         NoIntegration nointeg_;
-      }; 
+      };
 
     public:
       IntegratorConfig() : type_(IntegratorType::NONE), nointeg_{} {}
@@ -57,20 +56,11 @@ namespace fnb {
 
       void reset() {
         switch (type_) {
-        case IntegratorType::LEAPFROG:
-            leapfrog_ = Leapfrog{};
-            break;
-        case IntegratorType::WHFAST:
-            whfast_ = WHFast{};
-            break;
-        case IntegratorType::IAS15:
-            ias15_ = IAS15{};
-            break;
-        case IntegratorType::MERCURIUS:
-            mercurius_ = Mercurius{};
-            break;
-        default:
-            nointeg_ = NoIntegration{};
+        case IntegratorType::LEAPFROG: leapfrog_ = Leapfrog{}; break;
+        case IntegratorType::WHFAST: whfast_ = WHFast{}; break;
+        case IntegratorType::IAS15: ias15_ = IAS15{}; break;
+        case IntegratorType::MERCURIUS: mercurius_ = Mercurius{}; break;
+        default: nointeg_ = NoIntegration{};
         }
       }
 
@@ -87,7 +77,8 @@ namespace fnb {
         } else if constexpr (std::is_same_v<Integrator, Mercurius>) {
           if (type_ != IntegratorType::MERCURIUS) throw BadConfigAccess{};
           return mercurius_;
-        } else static_assert(sizeof(Integrator) == 0, "Invalid type");
+        } else
+          static_assert(sizeof(Integrator) == 0, "Invalid type");
       }
 
       template <typename Integrator> const Integrator& get() const {
@@ -103,7 +94,8 @@ namespace fnb {
         } else if constexpr (std::is_same_v<Integrator, Mercurius>) {
           if (type_ != IntegratorType::MERCURIUS) throw BadConfigAccess{};
           return mercurius_;
-        } else static_assert(sizeof(Integrator) == 0, "Invalid type");
+        } else
+          static_assert(sizeof(Integrator) == 0, "Invalid type");
       }
     } config;
 
@@ -126,7 +118,7 @@ namespace fnb {
       for (size_t i = 0; i < n; ++i) step(step_size);
     }
 
-    void integrate(double t, bool exact = false); 
+    void integrate(double t, bool exact = false);
 
     void add_particle(const IndParticle& p) { particles_.add_particle(p); }
     void add_particles(const std::vector<IndParticle>& ps) { particles_.add_particles(ps); }

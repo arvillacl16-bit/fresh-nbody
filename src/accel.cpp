@@ -6,7 +6,7 @@
 namespace fnb::accel {
   void basic(ParticleStore& particles, double epsilon2) {
     const size_t N = particles.N();
-    const size_t test_thres = particles.positions.test_thres() ? particles.positions.test_thres().get() : N;
+    const size_t test_thres = particles.test_thres().value_or(N);
 
     auto& positions = particles.positions;
     auto& accelerations = particles.accelerations;
@@ -32,7 +32,7 @@ namespace fnb::accel {
 
   void compensated(ParticleStore& particles, double epsilon2) {
     const size_t N = particles.N();
-    const size_t test_thres = particles.positions.test_thres() ? particles.positions.test_thres().get() : N;
+    const size_t test_thres = particles.test_thres().value_or(N);
 
     auto& positions = particles.positions;
     auto& accelerations = particles.accelerations;
