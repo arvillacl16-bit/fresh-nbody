@@ -3,35 +3,113 @@
 
 #include "integrator.hpp"
 #include "particle.hpp"
-#include "vec.hpp"
 #include <cstdint>
 #include <functional>
 
 namespace fnb {
-  enum class Integrator : uint8_t { NONE = 0, LEAPFROG, WHFAST, IAS15, MERCURIUS };
+  enum class IntegratorType : uint8_t { NONE = 0, LEAPFROG, WHFAST, IAS15, MERCURIUS };
+
+  struct NoIntegration {};
+
+  class BadConfigAccess : public std::exception {
+  public:
+    const char* what() const noexcept override { return "Wrong type used"; }
+  };
 
   class Simulation {
   private:
     struct Impl;
     std::unique_ptr<Impl> pimpl_;
 
+    
     double t_;
 
     ParticleStore particles_;
     ParticleStore particles_test_;
 
   public:
+    class IntegratorConfig {
+    private:
+      IntegratorType type_;
+      union {
+        Leapfrog leapfrog_;
+        WHFast whfast_;
+        IAS15 ias15_;
+        Mercurius mercurius_;
+        NoIntegration nointeg_;
+      }; 
+
+    public:
+      IntegratorConfig() : type_(IntegratorType::NONE), nointeg_{} {}
+      explicit IntegratorConfig(IntegratorType type) : type_(type) { reset(); }
+
+      IntegratorConfig(const Leapfrog& leapfrog) : type_(IntegratorType::LEAPFROG), leapfrog_(leapfrog) {}
+      IntegratorConfig(const WHFast& whfast) : type_(IntegratorType::WHFAST), whfast_(whfast) {}
+      IntegratorConfig(const IAS15& ias15) : type_(IntegratorType::IAS15), ias15_(ias15) {}
+      IntegratorConfig(const Mercurius& mercurius) : type_(IntegratorType::MERCURIUS), mercurius_(mercurius) {}
+
+      void set_type(IntegratorType type, bool do_reset = true) {
+        type_ = type;
+        if (do_reset) reset();
+      }
+
+      IntegratorType type() { return type_; }
+
+      void reset() {
+        switch (type_) {
+        case IntegratorType::LEAPFROG:
+            leapfrog_ = Leapfrog{};
+            break;
+        case IntegratorType::WHFAST:
+            whfast_ = WHFast{};
+            break;
+        case IntegratorType::IAS15:
+            ias15_ = IAS15{};
+            break;
+        case IntegratorType::MERCURIUS:
+            mercurius_ = Mercurius{};
+            break;
+        default:
+            nointeg_ = NoIntegration{};
+        }
+      }
+
+      template <typename Integrator> Integrator& get() {
+        if constexpr (std::is_same_v<Integrator, Leapfrog>) {
+          if (type_ != IntegratorType::LEAPFROG) throw BadConfigAccess{};
+          return leapfrog_;
+        } else if constexpr (std::is_same_v<Integrator, WHFast>) {
+          if (type_ != IntegratorType::WHFAST) throw BadConfigAccess{};
+          return whfast_;
+        } else if constexpr (std::is_same_v<Integrator, IAS15>) {
+          if (type_ != IntegratorType::IAS15) throw BadConfigAccess{};
+          return ias15_;
+        } else if constexpr (std::is_same_v<Integrator, Mercurius>) {
+          if (type_ != IntegratorType::MERCURIUS) throw BadConfigAccess{};
+          return mercurius_;
+        } else static_assert(sizeof(Integrator) == 0, "Invalid type");
+      }
+
+      template <typename Integrator> const Integrator& get() const {
+        if constexpr (std::is_same_v<Integrator, Leapfrog>) {
+          if (type_ != IntegratorType::LEAPFROG) throw BadConfigAccess{};
+          return leapfrog_;
+        } else if constexpr (std::is_same_v<Integrator, WHFast>) {
+          if (type_ != IntegratorType::WHFAST) throw BadConfigAccess{};
+          return whfast_;
+        } else if constexpr (std::is_same_v<Integrator, IAS15>) {
+          if (type_ != IntegratorType::IAS15) throw BadConfigAccess{};
+          return ias15_;
+        } else if constexpr (std::is_same_v<Integrator, Mercurius>) {
+          if (type_ != IntegratorType::MERCURIUS) throw BadConfigAccess{};
+          return mercurius_;
+        } else static_assert(sizeof(Integrator) == 0, "Invalid type");
+      }
+    } config;
+
     enum class Status : uint8_t { OK = 0, TERM };
 
     double dt;
-
-    union {
-      Integrator integrator;
-      Leapfrog leapfrog;
-      WHFast whfast;
-      IAS15 ias15;
-      Mercurius mercurius;
-    } config;
 
     std::function<Status(Simulation&)> heartbeat;
 
@@ -41,6 +119,13 @@ namespace fnb {
     Simulation& operator=(const Simulation&);
     Simulation& operator=(Simulation&&) noexcept;
     ~Simulation();
+
+    void step(double dt);
+    void steps(size_t n) {
+      for (size_t i = 0; i < n; ++i) step(dt);
+    }
+
+    void integrate(double t, bool exact = false); 
   };
 } // namespace fnb
 
