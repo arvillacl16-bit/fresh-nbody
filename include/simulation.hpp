@@ -5,6 +5,7 @@
 #include "particle.hpp"
 #include <cstdint>
 #include <functional>
+#include <optional>
 
 namespace fnb {
   enum class IntegratorType : uint8_t { NONE = 0, LEAPFROG, WHFAST, IAS15, MERCURIUS };
@@ -25,7 +26,6 @@ namespace fnb {
     double t_;
 
     ParticleStore particles_;
-    ParticleStore particles_test_;
 
   public:
     class IntegratorConfig {
@@ -121,11 +121,17 @@ namespace fnb {
     ~Simulation();
 
     void step(double dt);
-    void steps(size_t n) {
-      for (size_t i = 0; i < n; ++i) step(dt);
+    void steps(size_t n, std::optional<double> dt_ = std::optional<double>{}) {
+      double step_size = dt_.value_or(dt);
+      for (size_t i = 0; i < n; ++i) step(step_size);
     }
 
     void integrate(double t, bool exact = false); 
+
+    void add_particle(const IndParticle& p) { particles_.add_particle(p); }
+    void add_particles(const std::vector<IndParticle>& ps) { particles_.add_particles(ps); }
+    void remove_particle(size_t idx) { particles_.remove_particle(idx); }
+    void remove_particles(const std::vector<size_t>& idxs) { particles_.remove_particles(idxs); }
   };
 } // namespace fnb
 
