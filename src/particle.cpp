@@ -7,21 +7,36 @@ namespace fnb {
   } // namespace
 
   void ParticleStore::add_particle(const IndParticle& p) {
-    positions.push_back(p.pos);
-    velocities.push_back(p.vel);
-    accelerations.push_back({0, 0, 0});
-    mus.push_back(p.mu);
-    ids.push_back(p.id);
-  }
-
-  void ParticleStore::add_particles(const std::vector<IndParticle>& ps) {
-    for (const auto& p : ps) {
+    if (p.is_test) {
       positions.push_back(p.pos);
       velocities.push_back(p.vel);
       accelerations.push_back({0, 0, 0});
       mus.push_back(p.mu);
       ids.push_back(p.id);
+      if (!test_thres_) {
+        test_thres_ = N();
+      }
+    } else {
+      if (test_thres_) {
+        size_t& idx = test_thres_.value();
+        positions.insert(idx - 1, p.pos);
+        velocities.insert(idx - 1, p.vel);
+        accelerations.insert(idx - 1, {0, 0, 0});
+        mus.insert(idx - 1, p.mu);
+        ids.insert(idx - 1, p.id);
+        idx += 1;
+      } else {
+        positions.push_back(p.pos);
+        velocities.push_back(p.vel);
+        accelerations.push_back({0, 0, 0});
+        mus.push_back(p.mu);
+        ids.push_back(p.id);
+      }
     }
+  }
+
+  void ParticleStore::add_particles(const std::vector<IndParticle>& ps) {
+    for (const auto& p : ps) add_particle(p);
   }
 
   IndParticle ParticleStore::remove_particle(size_t idx) {

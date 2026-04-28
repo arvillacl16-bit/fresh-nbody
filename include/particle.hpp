@@ -4,9 +4,8 @@
 #include "vec.hpp"
 #include <cstddef>
 #include <cstdint>
-#include <exception>
-#include <stdexcept>
 #include <string_view>
+#include <optional>
 #include <vector>
 
 namespace fnb {
@@ -15,123 +14,16 @@ namespace fnb {
     Vec3 vel;
     double mu;
     uint64_t id;
+    bool is_test = false;
   };
 
   class Particle;
   class ConstParticle;
 
-  class BadOptionalAccess : public std::exception {
-  public:
-    const char* what() const noexcept override { return "Invalid access"; }
-  };
-
-  class OptIndex {
-  private:
-    size_t val_;
-    bool is_valid_;
-
-    void throw_not_valid() {
-      if (!is_valid_) throw BadOptionalAccess();
-    }
-
-  public:
-    OptIndex(size_t val) : val_(val), is_valid_(true) {}
-    OptIndex() : val_(0), is_valid_(false) {}
-
-    size_t get() {
-      throw_not_valid();
-      return val_;
-    }
-
-    OptIndex& operator=(size_t idx) {
-      val_ = idx;
-      is_valid_ = true;
-
-      return *this;
-    }
-
-    size_t operator+(OptIndex other) {
-      throw_not_valid();
-      return val_ + other.val_;
-    }
-
-    size_t operator-(OptIndex other) {
-      throw_not_valid();
-      return val_ - other.val_;
-    }
-
-    size_t operator*(OptIndex other) {
-      throw_not_valid();
-      return val_ * other.val_;
-    }
-
-    size_t operator/(OptIndex other) {
-      throw_not_valid();
-      return val_ / other.val_;
-    }
-
-    size_t operator%(OptIndex other) {
-      throw_not_valid();
-      return val_ % other.val_;
-    }
-
-    OptIndex& operator+=(OptIndex other) {
-      throw_not_valid();
-      val_ += other.val_;
-      return *this;
-    }
-
-    OptIndex& operator-=(OptIndex other) {
-      throw_not_valid();
-      val_ -= other.val_;
-      return *this;
-    }
-
-    OptIndex& operator*=(OptIndex other) {
-      throw_not_valid();
-      val_ *= other.val_;
-      return *this;
-    }
-
-    OptIndex& operator/=(OptIndex other) {
-      throw_not_valid();
-      val_ /= other.val_;
-      return *this;
-    }
-
-    OptIndex& operator%=(OptIndex other) {
-      throw_not_valid();
-      val_ %= other.val_;
-      return *this;
-    }
-
-    OptIndex& operator++() {
-      throw_not_valid();
-      ++val_;
-      return *this;
-    }
-
-    OptIndex& operator--() {
-      throw_not_valid();
-      --val_;
-      return *this;
-    }
-
-    size_t operator++(int) {
-      throw_not_valid();
-      return val_++;
-    }
-
-    bool is_valid() { return (bool)(*this); }
-    explicit operator bool() { return is_valid_; }
-  };
-
   template <typename T> class SyncStore {
   private:
     std::vector<T> data_;
     T def_val_{};
-
-    OptIndex test_thres_;
 
     SyncStore() = default;
 
@@ -142,39 +34,12 @@ namespace fnb {
 
     template <typename... Args> SyncStore(Args&&... args) : def_val_(std::forward<Args>(args)...) {}
 
-    void push_back(const T& el) {
-      if (test_thres_) {
-        data_.insert(data_.cbegin() + test_thres_.get(), el);
-        ++test_thres_;
-      }
-      data_.push_back(el);
-    }
+    void push_back(const T& el) { data_.push_back(el); }
+    void pop_back() { data_.pop_back(); }
+    void push_back(T&& el) { data_.push_back(el); }
 
-    void pop_back() {
-      if (test_thres_) {
-        data_.erase(data_.begin() + test_thres_.get());
-        --test_thres_;
-      }
-    }
-
-    void push_back(T&& el) {
-      if (test_thres_) {
-        data_.insert(data_.cbegin() + test_thres_.get(), el);
-        ++test_thres_;
-      }
-
-      data_.push_back(el);
-    }
-
-    void push_back_test(const T& el) {
-      if (!test_thres_) test_thres_ = data_.size();
-      data_.push_back(el);
-    }
-
-    void push_back_test(T&& el) {
-      if (!test_thres_) test_thres_ = data_.size();
-      data_.push_back(el);
-    }
+    void insert(size_t i, const T& val) { data_.insert(data_.begin() + i, val); }
+    void insert(size_t i, T&& val) { data_.insert(data_.begin() + i, val); }
 
     void resize(size_t sz) { data_.resize(sz); }
     void reserve(size_t sz) { data_.reserve(sz); }
@@ -200,7 +65,6 @@ namespace fnb {
 
     auto cbegin() const { return data_.cbegin(); }
     auto cend() const { return data_.cend(); }
-    auto test_thres() { return test_thres_; }
 
     friend class ParticleStore;
   };
@@ -213,6 +77,8 @@ namespace fnb {
     VecMap<Vec3> extra_params_vec_;
     VecMap<uint64_t> extra_params_int_;
     VecMap<void*> extra_params_ptr_;
+
+    std::optional<size_t> test_thres_;
 
   public:
     SyncStore<Vec3> positions;
@@ -241,6 +107,7 @@ namespace fnb {
     ConstParticle operator[](size_t idx) const;
 
     size_t N() { return positions.size(); }
+    auto test_thres() { return test_thres_; }
 
     friend class Particle;
     friend class ConstParticle;
