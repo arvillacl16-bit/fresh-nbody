@@ -2,7 +2,7 @@ project('FreshNBody', 'cpp', version : '0.1.0', default_options : ['cpp_std=c++1
 
 omp_dep = dependency('openmp')
 
-source_files = files('src/particle.cpp', 'src/leapfrog.cpp', 'src/simulation.cpp', 'src/accel.cpp')
+source_files = files('src/particle.cpp', 'src/leapfrog.cpp', 'src/mercurius.cpp', 'src/whfast.cpp', 'src/ias15.cpp', 'src/simulation.cpp', 'src/accel.cpp')
 
 inc = include_directories('include')
 
