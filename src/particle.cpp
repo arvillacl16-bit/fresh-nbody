@@ -56,6 +56,7 @@ namespace fnb {
       accelerations.pop_back();
       mus.pop_back();
       ids.pop_back();
+      return res;
     }
 
     if (test_thres_) {
@@ -112,26 +113,7 @@ namespace fnb {
     std::set s(idxs.begin(), idxs.end());
     std::vector<IndParticle> res;
     for (auto it = s.rbegin(); it != s.rend(); ++it) {
-      size_t idx = *it;
-      swap_last(positions, idx);
-      swap_last(velocities, idx);
-      swap_last(accelerations, idx);
-      swap_last(mus, idx);
-      swap_last(ids, idx);
-
-      IndParticle p;
-      p.pos = positions.back();
-      p.vel = velocities.back();
-      p.mu = mus.back();
-      p.id = ids.back();
-
-      positions.pop_back();
-      velocities.pop_back();
-      accelerations.pop_back();
-      mus.pop_back();
-      ids.pop_back();
-
-      res.push_back(p);
+      res.push_back(remove_particle(*it));
     }
 
     return res;
