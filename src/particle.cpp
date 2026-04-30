@@ -40,25 +40,71 @@ namespace fnb {
   }
 
   IndParticle ParticleStore::remove_particle(size_t idx) {
-    swap_last(positions, idx);
-    swap_last(velocities, idx);
-    swap_last(accelerations, idx);
-    swap_last(mus, idx);
-    swap_last(ids, idx);
-
-    if (idx == N() - 1) test_thres_ = {};
-
     IndParticle res;
-    res.pos = positions.back();
-    res.vel = velocities.back();
-    res.mu = mus.back();
-    res.id = ids.back();
+    if (idx == N() - 1) {
+      if (test_thres_) {
+        auto& thres = test_thres_.value();
+        if (thres == N() - 1) test_thres_ = {};
+      }
+      res.pos = positions.back();
+      res.vel = velocities.back();
+      res.id = ids.back();
+      res.is_test = true;
+      res.mu = mus.back();
+      positions.pop_back();
+      velocities.pop_back();
+      accelerations.pop_back();
+      mus.pop_back();
+      ids.pop_back();
+    }
 
-    positions.pop_back();
-    velocities.pop_back();
-    accelerations.pop_back();
-    mus.pop_back();
-    ids.pop_back();
+    if (test_thres_) {
+      auto& thres = test_thres_.value();
+      if (idx >= thres) {
+        res.pos = positions[idx];
+        res.vel = velocities[idx];
+        res.id = ids[idx];
+        res.is_test = true;
+        res.mu = mus[idx];
+        swap_last(positions, idx);
+        swap_last(velocities, idx);
+        swap_last(accelerations, idx);
+        swap_last(mus, idx);
+        swap_last(ids, idx);
+        positions.pop_back();
+        velocities.pop_back();
+        accelerations.pop_back();
+        mus.pop_back();
+        ids.pop_back();
+        --thres;
+      } else {
+        res.pos = positions[idx];
+        res.vel = velocities[idx];
+        res.id = ids[idx];
+        res.mu = mus[idx];
+        positions.erase(idx);
+        velocities.erase(idx);
+        accelerations.erase(idx);
+        ids.erase(idx);
+        mus.erase(idx);
+        --thres;
+      }
+    } else {
+      res.pos = positions[idx];
+      res.vel = velocities[idx];
+      res.id = ids[idx];
+      res.mu = mus[idx];
+      swap_last(positions, idx);
+      swap_last(velocities, idx);
+      swap_last(accelerations, idx);
+      swap_last(mus, idx);
+      swap_last(ids, idx);
+      positions.pop_back();
+      velocities.pop_back();
+      accelerations.pop_back();
+      mus.pop_back();
+      ids.pop_back();
+    }
     return res;
   }
 
@@ -90,6 +136,7 @@ namespace fnb {
 
     return res;
   }
+
   template <> SyncStore<double>& ParticleStore::get<double>(std::string_view param_name) {
     auto& extra_params = extra_params_dbl_;
     if (auto it = std::find_if(

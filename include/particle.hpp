@@ -41,6 +41,8 @@ namespace fnb {
     void insert(size_t i, const T& val) { data_.insert(data_.begin() + i, val); }
     void insert(size_t i, T&& val) { data_.insert(data_.begin() + i, val); }
 
+    void erase(size_t i) { data_.erase(data_.begin() + i); }
+
     void resize(size_t sz) { data_.resize(sz); }
     void reserve(size_t sz) { data_.reserve(sz); }
 
