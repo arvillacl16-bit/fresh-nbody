@@ -46,6 +46,8 @@ namespace fnb {
     swap_last(mus, idx);
     swap_last(ids, idx);
 
+    if (idx == N() - 1) test_thres_ = {};
+
     IndParticle res;
     res.pos = positions.back();
     res.vel = velocities.back();
