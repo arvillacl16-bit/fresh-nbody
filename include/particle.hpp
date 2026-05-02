@@ -108,8 +108,8 @@ namespace fnb {
     Particle operator[](size_t idx);
     ConstParticle operator[](size_t idx) const;
 
-    size_t N() { return positions.size(); }
-    auto test_thres() { return test_thres_; }
+    size_t N() const { return positions.size(); }
+    auto test_thres() const { return test_thres_; }
 
     friend class Particle;
     friend class ConstParticle;
