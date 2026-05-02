@@ -124,6 +124,9 @@ namespace fnb {
     void add_particles(const std::vector<IndParticle>& ps) { particles_.add_particles(ps); }
     void remove_particle(size_t idx) { particles_.remove_particle(idx); }
     void remove_particles(const std::vector<size_t>& idxs) { particles_.remove_particles(idxs); }
+
+    std::pair<Vec3, Vec3> com();
+    void move_to_com();
   };
 } // namespace fnb
 

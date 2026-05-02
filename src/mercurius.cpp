@@ -3,4 +3,4 @@
 
 namespace fnb {
   void Mercurius::step(ParticleStore&, double) {}
-}
+} // namespace fnb

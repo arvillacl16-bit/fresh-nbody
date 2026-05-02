@@ -58,4 +58,29 @@ namespace fnb {
       if (status != Status::OK) std::cerr << "ERROR: Integration terminated with status " << status_to_str(status) << '\n';
     }
   }
+
+  std::pair<Vec3, Vec3> Simulation::com() {
+    const size_t N = particles_.test_thres().value_or(particles_.N());
+    double total_mass = 0;
+#pragma omp parallel for
+    for (size_t i = 0; i < N; ++i) total_mass += particles_.mus[i];
+
+    Vec3 pos{};
+    Vec3 vel{};
+#pragma omp parallel for reduction(+ : pos, vel)
+    for (size_t i = 0; i < particles_.test_thres().value_or(particles_.N()); ++i) {
+      pos += particles_.positions[i] * particles_.mus[i] / total_mass;
+      vel += particles_.velocities[i] * particles_.mus[i] / total_mass;
+    }
+    return {pos, vel};
+  }
+
+  void Simulation::move_to_com() {
+    auto res = com();
+#pragma omp parallel for
+    for (size_t i = 0; i < particles_.N(); ++i) {
+      particles_.positions[i] -= res.first;
+      particles_.velocities[i] -= res.second;
+    }
+  }
 } // namespace fnb

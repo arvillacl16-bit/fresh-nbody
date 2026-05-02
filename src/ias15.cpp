@@ -3,4 +3,4 @@
 
 namespace fnb {
   void IAS15::step(ParticleStore&, double) {}
-}
+} // namespace fnb
