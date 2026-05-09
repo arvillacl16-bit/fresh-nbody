@@ -25,7 +25,6 @@ namespace fnb::transform {
   void barycentric_to_inertial_p(ParticleStore& particles, const ParticleStore& p_b);
   void barycentric_to_inertial_pv(ParticleStore& particles, const ParticleStore& p_b);
   void barycentric_to_inertial_a(ParticleStore& particles, const ParticleStore& p_b);
-}
+} // namespace fnb::transform
 
 #endif
-

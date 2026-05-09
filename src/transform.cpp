@@ -81,7 +81,7 @@ namespace fnb::transform {
     const size_t N = particles.N();
     const size_t N_thres = particles.N();
     double M = 0;
-#pragma omp parallel for reduction(+:M)
+#pragma omp parallel for reduction(+ : M)
     for (size_t i = 0; i < N; ++i) M += p_j.mus[i];
     Vec3 R = p_j.accelerations[0] * M;
     for (size_t i = N; i > N_thres; --i) particles.accelerations[i] += R;
@@ -99,7 +99,7 @@ namespace fnb::transform {
     const size_t N = particles.N();
     const size_t N_thres = particles.N();
     double M = 0;
-#pragma omp parallel for reduction(+:M)
+#pragma omp parallel for reduction(+ : M)
     for (size_t i = 0; i < N; ++i) M += p_j.mus[i];
     Vec3 R = p_j.positions[0] * M;
     for (size_t i = N; i > N_thres; --i) particles.positions[i] += R;
@@ -116,7 +116,7 @@ namespace fnb::transform {
     const size_t N = particles.N();
     const size_t N_thres = particles.N();
     double M = 0;
-#pragma omp parallel for reduction(+:M)
+#pragma omp parallel for reduction(+ : M)
     for (size_t i = 0; i < N; ++i) M += p_j.mus[i];
     Vec3 R_pos = p_j.positions[0] * M;
     Vec3 R_vel = p_j.velocities[0] * M;
@@ -136,4 +136,4 @@ namespace fnb::transform {
     particles.positions[0] = R_pos / p_j.mus[0];
     particles.velocities[0] = R_vel / p_j.mus[0];
   }
-}
+} // namespace fnb::transform
