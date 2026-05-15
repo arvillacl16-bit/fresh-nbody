@@ -14,7 +14,7 @@ namespace fnb {
     mus.push_back(p.mu);
     ids.push_back(p.id);
 
-    if (p.is_test && !test_thres_) test_thres_ = N() - 1; 
+    if (p.is_test && !test_thres_) test_thres_ = N() - 1;
     else if (test_thres_) {
       size_t target_idx = test_thres_.value();
       size_t last_idx = N() - 1;
@@ -52,7 +52,7 @@ namespace fnb {
       swap_last(mus, idx);
       swap_last(ids, idx);
 
-      if (test_thres_ && test_thres_.value() == last_idx) test_thres_ = std::nullopt; 
+      if (test_thres_ && test_thres_.value() == last_idx) test_thres_ = std::nullopt;
     } else {
       if (test_thres_) {
         size_t last_massive_idx = test_thres_.value() - 1;

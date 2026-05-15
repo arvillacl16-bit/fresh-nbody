@@ -32,21 +32,36 @@ namespace fnb::transform {
 
   void jacobi_to_inertial_pos(ParticleStore& particles, const ParticleStore& p_j) {
     const size_t N = particles.N();
-    const size_t N_thres = particles.test_thres().value_or(N - 1);
     if (N < 2) return;
-    double M = 0;
-#pragma omp parallel for reduction(+ : M)
-    for (size_t i = 1; i < N; ++i) M += p_j.mus[i];
-    Vec3 R_pos = p_j.positions[0] * M;
-    for (size_t i = N - 1; i > N_thres; --i) {
-      particles.positions[i] = p_j.positions[i] + R_pos / M;
+
+    const size_t N_thres = particles.test_thres().value_or(N);
+    const Vec3 act_com_pos = p_j.positions[0];
+
+    double total_chain_mass = p_j.mus[0];
+    for (size_t i = 1; i < N_thres; ++i) {
+      total_chain_mass += p_j.mus[i];
     }
-    for (size_t i = N_thres; i > 0; --i) {
-      R_pos = (R_pos + p_j.mus[i] * p_j.positions[i]) / M;
-      particles.positions[i] += R_pos;
-      M -= p_j.mus[i];
-      R_pos *= M;
+    if (N_thres < N) {
+      total_chain_mass += p_j.mus[N_thres];
     }
-    particles.positions[0] = R_pos / p_j.mus[0];
+
+    double current_tot_mass = total_chain_mass;
+    Vec3 current_com_pos = act_com_pos;
+
+    for (size_t i = N_thres - 1; i > 0; --i) {
+      double sub_mass = current_tot_mass - p_j.mus[i];
+
+      particles.positions[i] = current_com_pos + (sub_mass / current_tot_mass) * p_j.positions[i];
+
+      current_com_pos = current_com_pos - (p_j.mus[i] / current_tot_mass) * p_j.positions[i];
+      current_tot_mass = sub_mass;
+    }
+
+    particles.positions[0] = current_com_pos;
+
+#pragma omp parallel for schedule(static) if (N - N_thres > 64)
+    for (size_t i = N_thres; i < N; ++i) {
+      particles.positions[i] = p_j.positions[i] + act_com_pos;
+    }
   }
 } // namespace fnb::transform

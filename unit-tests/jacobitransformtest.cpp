@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
-#include <ranges>
-#include <random>
 #include "particle.hpp"
 #include "transform.hpp"
+#include <gtest/gtest.h>
+#include <random>
+#include <ranges>
 
 namespace rv = std::views;
 
@@ -13,11 +13,11 @@ TEST(JacobiTransform, ReversibilityTest) {
   std::uniform_real_distribution<> dist(-20, 20);
 
   auto gen_random_particle = [&](unsigned long long id) {
-    return IndParticle {
-      .pos = {dist(gen) * 1.496e8, dist(gen) * 1.496e8, dist(gen) * 1.496e8},
-      .vel = {dist(gen), dist(gen), dist(gen)},
-      .mu = 398600,
-      .id = id,
+    return IndParticle{
+        .pos = {dist(gen) * 1.496e8, dist(gen) * 1.496e8, dist(gen) * 1.496e8},
+        .vel = {dist(gen), dist(gen), dist(gen)},
+        .mu = 398600,
+        .id = id,
     };
   };
 
@@ -34,7 +34,6 @@ TEST(JacobiTransform, ReversibilityTest) {
   }
 
   orig = p;
-  
 
   transform::inertial_to_jacobi_pos(p, useless);
   transform::jacobi_to_inertial_pos(p, useless);
@@ -44,5 +43,5 @@ TEST(JacobiTransform, ReversibilityTest) {
     total_error += p[i].pos() - orig[i].pos();
   }
 
-  ASSERT_LE(total_error.mag2(), 100.);
+  ASSERT_LE(total_error.mag2(), 1.);
 }
