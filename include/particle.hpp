@@ -12,7 +12,7 @@ namespace fnb {
   struct IndParticle {
     Vec3 pos;
     Vec3 vel;
-    double mu;
+    double mu = 0;
     uint64_t id;
     bool is_test = false;
   };
@@ -103,7 +103,6 @@ namespace fnb {
     void add_particle(const IndParticle& p);
     void add_particles(const std::vector<IndParticle>& ps);
     IndParticle remove_particle(size_t idx);
-    std::vector<IndParticle> remove_particles(const std::vector<size_t>& idxs);
 
     Particle operator[](size_t idx);
     ConstParticle operator[](size_t idx) const;

@@ -1,5 +1,6 @@
+#include "particle.hpp"
 #include "freshnbody.hpp"
-#include <set>
+#include <stdexcept>
 
 namespace fnb {
   namespace {
@@ -7,31 +8,24 @@ namespace fnb {
   } // namespace
 
   void ParticleStore::add_particle(const IndParticle& p) {
-    if (p.is_test) {
-      positions.push_back(p.pos);
-      velocities.push_back(p.vel);
-      accelerations.push_back({0, 0, 0});
-      mus.push_back(p.mu);
-      ids.push_back(p.id);
-      if (!test_thres_) {
-        test_thres_ = N();
-      }
-    } else {
-      if (test_thres_) {
-        size_t& idx = test_thres_.value();
-        positions.insert(idx - 1, p.pos);
-        velocities.insert(idx - 1, p.vel);
-        accelerations.insert(idx - 1, {0, 0, 0});
-        mus.insert(idx - 1, p.mu);
-        ids.insert(idx - 1, p.id);
-        idx += 1;
-      } else {
-        positions.push_back(p.pos);
-        velocities.push_back(p.vel);
-        accelerations.push_back({0, 0, 0});
-        mus.push_back(p.mu);
-        ids.push_back(p.id);
-      }
+    positions.push_back(p.pos);
+    velocities.push_back(p.vel);
+    accelerations.push_back({});
+    mus.push_back(p.mu);
+    ids.push_back(p.id);
+
+    if (p.is_test && !test_thres_) test_thres_ = N() - 1; 
+    else if (test_thres_) {
+      size_t target_idx = test_thres_.value();
+      size_t last_idx = N() - 1;
+
+      std::swap(positions[target_idx], positions[last_idx]);
+      std::swap(velocities[target_idx], velocities[last_idx]);
+      std::swap(accelerations[target_idx], accelerations[last_idx]);
+      std::swap(mus[target_idx], mus[last_idx]);
+      std::swap(ids[target_idx], ids[last_idx]);
+
+      test_thres_.value() += 1;
     }
   }
 
@@ -40,81 +34,56 @@ namespace fnb {
   }
 
   IndParticle ParticleStore::remove_particle(size_t idx) {
-    IndParticle res;
-    if (idx == N() - 1) {
-      if (test_thres_) {
-        auto& thres = test_thres_.value();
-        if (thres == N() - 1) test_thres_ = {};
-      }
-      res.pos = positions.back();
-      res.vel = velocities.back();
-      res.id = ids.back();
-      res.is_test = true;
-      res.mu = mus.back();
-      positions.pop_back();
-      velocities.pop_back();
-      accelerations.pop_back();
-      mus.pop_back();
-      ids.pop_back();
-      return res;
-    }
+    if (idx >= N()) throw std::out_of_range("Index out of bounds");
 
-    if (test_thres_) {
-      auto& thres = test_thres_.value();
-      if (idx >= thres) {
-        res.pos = positions[idx];
-        res.vel = velocities[idx];
-        res.id = ids[idx];
-        res.is_test = true;
-        res.mu = mus[idx];
-        swap_last(positions, idx);
-        swap_last(velocities, idx);
-        swap_last(accelerations, idx);
-        swap_last(mus, idx);
-        swap_last(ids, idx);
-        positions.pop_back();
-        velocities.pop_back();
-        accelerations.pop_back();
-        mus.pop_back();
-        ids.pop_back();
-        --thres;
-      } else {
-        res.pos = positions[idx];
-        res.vel = velocities[idx];
-        res.id = ids[idx];
-        res.mu = mus[idx];
-        positions.erase(idx);
-        velocities.erase(idx);
-        accelerations.erase(idx);
-        ids.erase(idx);
-        mus.erase(idx);
-        --thres;
-      }
-    } else {
-      res.pos = positions[idx];
-      res.vel = velocities[idx];
-      res.id = ids[idx];
-      res.mu = mus[idx];
+    IndParticle res;
+    res.pos = positions[idx];
+    res.vel = velocities[idx];
+    res.mu = mus[idx];
+    res.id = ids[idx];
+    res.is_test = (test_thres_ && idx >= test_thres_.value());
+
+    size_t last_idx = N() - 1;
+
+    if (res.is_test) {
       swap_last(positions, idx);
       swap_last(velocities, idx);
       swap_last(accelerations, idx);
       swap_last(mus, idx);
       swap_last(ids, idx);
-      positions.pop_back();
-      velocities.pop_back();
-      accelerations.pop_back();
-      mus.pop_back();
-      ids.pop_back();
-    }
-    return res;
-  }
 
-  std::vector<IndParticle> ParticleStore::remove_particles(const std::vector<size_t>& idxs) {
-    std::set s(idxs.begin(), idxs.end());
-    std::vector<IndParticle> res;
-    for (auto it = s.rbegin(); it != s.rend(); ++it) {
-      res.push_back(remove_particle(*it));
+      if (test_thres_ && test_thres_.value() == last_idx) test_thres_ = std::nullopt; 
+    } else {
+      if (test_thres_) {
+        size_t last_massive_idx = test_thres_.value() - 1;
+
+        std::swap(positions[idx], positions[last_massive_idx]);
+        std::swap(velocities[idx], velocities[last_massive_idx]);
+        std::swap(accelerations[idx], accelerations[last_massive_idx]);
+        std::swap(mus[idx], mus[last_massive_idx]);
+        std::swap(ids[idx], ids[last_massive_idx]);
+
+        swap_last(positions, last_massive_idx);
+        swap_last(velocities, last_massive_idx);
+        swap_last(accelerations, last_massive_idx);
+        swap_last(mus, last_massive_idx);
+        swap_last(ids, last_massive_idx);
+
+        test_thres_.value() -= 1;
+      } else {
+        swap_last(positions, idx);
+        swap_last(velocities, idx);
+        swap_last(accelerations, idx);
+        swap_last(mus, idx);
+        swap_last(ids, idx);
+      }
     }
+
+    positions.pop_back();
+    velocities.pop_back();
+    accelerations.pop_back();
+    mus.pop_back();
+    ids.pop_back();
 
     return res;
   }

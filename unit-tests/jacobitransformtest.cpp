@@ -26,18 +26,18 @@ TEST(JacobiTransform, ReversibilityTest) {
   ParticleStore orig;
 
   p.add_particle({.mu = 1.327e11, .id = 0});
-  useless.add_particle(IndParticle{});
+  useless.add_particle(IndParticle{.mu = 1.327e11});
 
   for (auto k : rv::iota(1, 7)) {
     p.add_particle(gen_random_particle(k));
-    useless.add_particle(IndParticle{});
+    useless.add_particle(IndParticle{.mu = 398600});
   }
 
   orig = p;
   
 
-  transform::inertial_to_jacobi_pv(p, useless);
-  transform::jacobi_to_inertial_pv(p, useless);
+  transform::inertial_to_jacobi_pos(p, useless);
+  transform::jacobi_to_inertial_pos(p, useless);
 
   Vec3 total_error;
   for (auto i : rv::iota(0, 7)) {
