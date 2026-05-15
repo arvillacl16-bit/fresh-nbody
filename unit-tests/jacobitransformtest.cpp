@@ -26,6 +26,7 @@ TEST(JacobiTransform, ReversibilityTest) {
   ParticleStore orig;
 
   p.add_particle({.mu = 1.327e11, .id = 0});
+  useless.add_particle(IndParticle{});
 
   for (auto k : rv::iota(1, 7)) {
     p.add_particle(gen_random_particle(k));
