@@ -153,4 +153,38 @@ namespace fnb::transform {
       particles.velocities[i] = p_j.velocities[i] + act_com_pos;
     }
   }
+
+  void inertial_to_demhelio_pos(const ParticleStore& particles, ParticleStore& p_h) {
+    p_h.positions[0] = [&](){
+      Vec3 bary;
+      double total_mu = 0;
+#pragma omp parallel for reduction (+:bary, total_mu)
+      for (size_t i = 0; i < particles.test_thres().value_or(particles.N()); ++i) {
+        bary += particles.mus[i] * particles.positions[i];
+        total_mu += particles.mus[i];
+      }
+
+      bary /= total_mu;
+      return bary;
+    }();
+#pragma omp parallel for
+    for (size_t i = 1; i < particles.N(); ++i) p_h.positions[i] = particles.positions[i] - particles.positions[0];
+  }
+
+  void inertial_to_demhelio_vel(const ParticleStore& particles, ParticleStore& p_h) {
+    double star_mu = particles.mus[0];
+
+    Vec3 total_momentum;
+    double total_mu = 0;
+#pragma omp parallel for reduction (+:total_momentum, total_mu)
+    for (size_t i = 0; i < particles.test_thres().value_or(particles.N()); ++i) { 
+      total_momentum += particles.mus[i] * particles.velocities[i]; 
+      total_mu += particles.mus[i];
+    }
+
+    p_h.velocities[0] = total_momentum / total_mu;
+
+#pragma omp parallel for
+    for (size_t i = 1; i < particles.N(); ++i) p_h.velocities[i] = particles.velocities[i] - particles.velocities[0];
+  }
 } // namespace fnb::transform
