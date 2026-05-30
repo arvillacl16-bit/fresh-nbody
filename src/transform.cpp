@@ -3,7 +3,7 @@
 #include <cstddef>
 
 namespace fnb::transform {
-  void inertial_to_jacobi_pos(const ParticleStore& particles, ParticleStore& p_j) {
+  void inertial_to_jacobi_pos(const ParticleStore& restrict particles, ParticleStore& restrict p_j) {
     const size_t N = particles.N();
     const size_t N_thres = particles.test_thres().value_or(N);
     if (N < 2) return;
@@ -30,7 +30,7 @@ namespace fnb::transform {
     p_j.positions[0] = act_com_pos;
   }
 
-  void inertial_to_jacobi_vel(const ParticleStore& particles, ParticleStore& p_j) {
+  void inertial_to_jacobi_vel(const ParticleStore& restrict particles, ParticleStore& restrict p_j) {
     const size_t N = particles.N();
     const size_t N_thres = particles.test_thres().value_or(N);
     if (N < 2) return;
@@ -57,7 +57,7 @@ namespace fnb::transform {
     p_j.velocities[0] = act_com_pos;
   }
 
-  void inertial_to_jacobi_acc(const ParticleStore& particles, ParticleStore& p_j) {
+  void inertial_to_jacobi_acc(const ParticleStore& restrict particles, ParticleStore& restrict p_j) {
     const size_t N = particles.N();
     const size_t N_thres = particles.test_thres().value_or(N);
     if (N < 2) return;
@@ -84,7 +84,7 @@ namespace fnb::transform {
     p_j.accelerations[0] = act_com_pos;
   }
 
-  void jacobi_to_inertial_pos(ParticleStore& particles, const ParticleStore& p_j) {
+  void jacobi_to_inertial_pos(ParticleStore& restrict particles, const ParticleStore& restrict p_j) {
     const size_t N = particles.N();
     if (N < 2) return;
 
@@ -119,7 +119,7 @@ namespace fnb::transform {
     }
   }
 
-  void jacobi_to_inertial_vel(ParticleStore& particles, const ParticleStore& p_j) {
+  void jacobi_to_inertial_vel(ParticleStore& restrict particles, const ParticleStore& restrict p_j) {
     const size_t N = particles.N();
     if (N < 2) return;
 
@@ -154,37 +154,59 @@ namespace fnb::transform {
     }
   }
 
-  void inertial_to_demhelio_pos(const ParticleStore& particles, ParticleStore& p_h) {
-    p_h.positions[0] = [&](){
-      Vec3 bary;
-      double total_mu = 0;
+  void inertial_to_demhelio_pos(const ParticleStore& restrict particles, ParticleStore& restrict p_h) {
+    double total_mu = 0;
+    Vec3 bary;
 #pragma omp parallel for reduction (+:bary, total_mu)
-      for (size_t i = 0; i < particles.test_thres().value_or(particles.N()); ++i) {
-        bary += particles.mus[i] * particles.positions[i];
-        total_mu += particles.mus[i];
-      }
-
-      bary /= total_mu;
-      return bary;
-    }();
-#pragma omp parallel for
-    for (size_t i = 1; i < particles.N(); ++i) p_h.positions[i] = particles.positions[i] - particles.positions[0];
+    for (size_t i = 0; i < particles.test_thres().value_or(particles.N()); ++i) {
+      bary += particles.mus[i] * particles.positions[i];
+      total_mu += particles.mus[i];
+    }
+    p_h.positions[0] = bary / total_mu;
+    Vec3 star_pos = particles.positions[0];
+#pragma omp parallel for default(none) shared(p_h, particles, star_pos)
+    for (size_t i = 1; i < particles.N(); ++i) p_h.positions[i] = particles.positions[i] - star_pos;
   }
 
-  void inertial_to_demhelio_vel(const ParticleStore& particles, ParticleStore& p_h) {
-    double star_mu = particles.mus[0];
-
-    Vec3 total_momentum;
+  void inertial_to_demhelio_vel(const ParticleStore& restrict particles, ParticleStore& restrict p_h) {
     double total_mu = 0;
-#pragma omp parallel for reduction (+:total_momentum, total_mu)
-    for (size_t i = 0; i < particles.test_thres().value_or(particles.N()); ++i) { 
-      total_momentum += particles.mus[i] * particles.velocities[i]; 
+    Vec3 bary;
+#pragma omp parallel for reduction (+:bary, total_mu)
+    for (size_t i = 0; i < particles.test_thres().value_or(particles.N()); ++i) {
+      bary += particles.mus[i] * particles.velocities[i];
+      total_mu += particles.mus[i];
+    }
+    p_h.velocities[0] = bary / total_mu;
+    Vec3 star_pos = particles.velocities[0];
+#pragma omp parallel for default(none) shared(p_h, particles, star_pos)
+    for (size_t i = 1; i < particles.N(); ++i) p_h.velocities[i] = particles.velocities[i] - star_pos;
+  }
+  
+  void demhelio_to_inertial_pos(ParticleStore& restrict particles, const ParticleStore& restrict p_h) {
+    double total_mu = particles.mus[0];
+    Vec3 everything_except_star;
+#pragma omp parallel for reduction (+:total_mu, everything_except_star)
+    for (size_t i = 1; i < particles.test_thres().value_or(particles.N()); ++i) {
+      everything_except_star += p_h.positions[i] * particles.mus[i];
       total_mu += particles.mus[i];
     }
 
-    p_h.velocities[0] = total_momentum / total_mu;
-
+    Vec3 x0 = particles.positions[0] = p_h.positions[0] - everything_except_star / total_mu;
 #pragma omp parallel for
-    for (size_t i = 1; i < particles.N(); ++i) p_h.velocities[i] = particles.velocities[i] - particles.velocities[0];
+    for (size_t i = 1; i < particles.N(); ++i) particles.positions[i] = p_h.positions[i] + x0;
+  }
+
+  void demhelio_to_inertial_vel(ParticleStore& restrict particles, const ParticleStore& restrict p_h) {
+    double total_mu = particles.mus[0];
+    Vec3 everything_except_star;
+#pragma omp parallel for reduction (+:total_mu, everything_except_star)
+    for (size_t i = 1; i < particles.test_thres().value_or(particles.N()); ++i) {
+      everything_except_star += p_h.velocities[i] * particles.mus[i];
+      total_mu += particles.mus[i];
+    }
+
+    Vec3 x0 = particles.velocities[0] = p_h.velocities[0] - everything_except_star / total_mu;
+#pragma omp parallel for
+    for (size_t i = 1; i < particles.N(); ++i) particles.velocities[i] = p_h.velocities[i] + x0;
   }
 } // namespace fnb::transform

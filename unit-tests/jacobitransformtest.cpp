@@ -35,8 +35,8 @@ TEST(JacobiTransform, ReversibilityTest) {
 
   orig = p;
 
-  transform::inertial_to_jacobi_pos(p, useless);
-  transform::jacobi_to_inertial_pos(p, useless);
+  transform::inertial_to_demhelio_pos(p, useless);
+  transform::demhelio_to_inertial_pos(p, useless);
 
   Vec3 total_error;
   for (auto i : rv::iota(0, 7)) {

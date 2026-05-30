@@ -3,6 +3,14 @@
 
 #include <cmath>
 
+#if defined(__GNUC__) || defined(__clang__)
+#define restrict __restrict__
+#elif defined(_MSC_VER)
+#define restrict __restrict
+#else
+#define restrict
+#endif
+
 namespace fnb {
   struct Vec3;
   inline constexpr Vec3 operator-(Vec3 a, Vec3 b);
