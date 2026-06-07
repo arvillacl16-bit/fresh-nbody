@@ -35,13 +35,16 @@ TEST(JacobiTransform, ReversibilityTest) {
 
   orig = p;
 
-  transform::inertial_to_demhelio_pos(p, useless);
-  transform::demhelio_to_inertial_pos(p, useless);
+  transform::inertial_to_whds_pos(p, useless);
+  transform::inertial_to_whds_vel(p, useless);
+  transform::whds_to_inertial_pos(p, useless);
+  transform::whds_to_inertial_vel(p, useless);
 
   Vec3 total_error;
   for (auto i : rv::iota(0, 7)) {
     total_error += p[i].pos() - orig[i].pos();
+    total_error += p[i].vel() - orig[i].vel();
   }
 
-  ASSERT_LE(total_error.mag2(), 1.);
+  ASSERT_LE(total_error.mag2(), 2.);
 }

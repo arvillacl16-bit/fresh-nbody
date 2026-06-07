@@ -237,4 +237,46 @@ namespace fnb::transform {
 #pragma omp parallel for
     for (size_t i = 1; i < particles.N(); ++i) particles.accelerations[i] = p_h.accelerations[i] + x0;
   }
+
+  void inertial_to_whds_pos(const ParticleStore& restrict particles, ParticleStore& restrict p_h) {
+    Vec3 star_pos = p_h.positions[0] = particles.positions[0];
+#pragma omp parallel for
+    for (size_t i = 1; i < particles.N(); ++i) p_h.positions[i] = particles.positions[i] - star_pos;
+  }
+
+  void inertial_to_whds_vel(const ParticleStore& restrict particles, ParticleStore& restrict p_h) {
+    Vec3 total_momentum;
+    double total_mu = 0;
+#pragma omp parallel for reduction(+:total_momentum, total_mu)
+    for (size_t i = 0; i < particles.test_thres().value_or(particles.N()); ++i) {
+      total_momentum += particles.mus[i] * particles.velocities[i];
+      total_mu += particles.mus[i];
+    }
+
+    p_h.velocities[0] = total_momentum / total_mu;
+    Vec3 star_vel = particles.velocities[0];
+#pragma omp parallel for
+    for (size_t i = 1; i < particles.N(); ++i) p_h.velocities[i] = particles.velocities[i] - star_vel;
+  }
+
+  void whds_to_inertial_pos(ParticleStore& restrict particles, const ParticleStore& restrict p_h) {
+    Vec3 star_pos = particles.positions[0] = p_h.positions[0];
+#pragma omp parallel for
+    for (size_t i = 1; i < particles.N(); ++i) particles.positions[i] = star_pos + p_h.positions[i];
+  }
+
+  void whds_to_inertial_vel(ParticleStore& restrict particles, const ParticleStore& restrict p_h) {
+    Vec3 star_vel_correction;
+    double total_mu = 0;
+#pragma omp parallel for reduction(+:star_vel_correction, total_mu)
+    for (size_t i = 1; i < particles.N(); ++i) {
+      star_vel_correction += p_h.mus[i] * p_h.velocities[i];
+      total_mu += p_h.mus[i];
+    }
+    total_mu += particles.mus[0];
+
+    Vec3 v0 = particles.velocities[0] = p_h.velocities[0] - star_vel_correction / total_mu;
+#pragma omp parallel for
+    for (size_t i = 1; i < particles.N(); ++i) particles.velocities[i] = v0 + p_h.velocities[i];
+  }
 } // namespace fnb::transform
