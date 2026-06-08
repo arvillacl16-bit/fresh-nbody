@@ -1,6 +1,7 @@
 # FreshNBody
 
 A WIP gravitational N-body simulator written in C++, which will support various different integrators. The code should be cross-platform.
+The link to the YouTube playlist this is tied to is [here](https://www.youtube.com/playlist?list=PL8qU4NnODTderRWeEFPnRbgYEOUKHAXgj).
 
 ## Dependencies
 
@@ -33,6 +34,8 @@ The shared library should be located at ./builddir/freshnbody.[so/dll/dylib] or 
 ```sh
 meson install -C builddir
 ```
+
+Note: you can set build-tests to true to run tests, but those require C++20 to build.
 
 ## Contributing
 
