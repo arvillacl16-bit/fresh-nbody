@@ -31,9 +31,9 @@ namespace fnb {
     }
   }
 
-  void IAS15::step(ParticleStore& particles) {
+  double IAS15::step(ParticleStore& particles) {
     size_t N = particles.N();
-    if (N == 0) return;
+    if (N == 0) return 0.01;
 
     y0_.resize(N);
     v0_.resize(N);
@@ -116,5 +116,7 @@ namespace fnb {
     if (max_delta > 0.0) {
       dt_ = dt_ * std::pow(epsilon_dtadjust / max_delta, 1.0 / 15.0) * 0.9;
     }
+
+    return dt_;
   }
 } // namespace fnb

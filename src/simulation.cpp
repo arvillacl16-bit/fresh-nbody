@@ -42,24 +42,34 @@ namespace fnb {
     }
   }
 
-  void Simulation::step(double dt) {
+  double Simulation::step(double dt) {
     switch (config.type()) {
-    case IntegratorType::LEAPFROG: config.get<Leapfrog>().step(particles_, dt); break;
-    case IntegratorType::WHFAST: config.get<WHFast>().step(particles_, dt); break;
-    case IntegratorType::IAS15: config.get<IAS15>().step(particles_); break;
-    case IntegratorType::MERCURIUS: config.get<Mercurius>().step(particles_, dt); break;
-    default: int _;
+    case IntegratorType::LEAPFROG: config.get<Leapfrog>().step(particles_, dt); return {};
+    case IntegratorType::WHFAST: config.get<WHFast>().step(particles_, dt); return {};
+    case IntegratorType::IAS15: return config.get<IAS15>().step(particles_);
+    case IntegratorType::MERCURIUS: config.get<Mercurius>().step(particles_, dt); return {};
+    default: return {};
     }
   }
 
   void Simulation::integrate(double t, bool exact) {
-    while (t_ < t) {
-      double step_size = exact ? (dt < t - t_ ? dt : t - t_) : dt;
-      step(step_size);
-      t_ += step_size;
+    if (config.type() == IntegratorType::IAS15) {
+      if (exact) std::cerr << "WARNING: IAS15 does not allow exact." << '\n';
+      while (t_ < t) {
+        double step_size = step(dt);
+        t_ += step_size;
+        Status status = heartbeat(*this);
+        if (status != Status::OK) std::cerr << "ERROR: Integration terminated with status" << status_to_str(status) << '\n';
+      }
+    } else {
+      while (t_ < t) {
+        double step_size = exact ? (dt < t - t_ ? dt : t - t_) : dt;
+        step(step_size);
+        t_ += step_size;
 
-      Status status = heartbeat(*this);
-      if (status != Status::OK) std::cerr << "ERROR: Integration terminated with status " << status_to_str(status) << '\n';
+        Status status = heartbeat(*this);
+        if (status != Status::OK) std::cerr << "ERROR: Integration terminated with status " << status_to_str(status) << '\n';
+      }
     }
   }
 

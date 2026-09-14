@@ -40,7 +40,7 @@ namespace fnb {
     unsigned int max_iterations = 12;
     double epsilon = 1e-12;
     double epsilon_dtadjust = 1e-9;
-    void step(ParticleStore& particles);
+    double step(ParticleStore& particles);
   };
 
   class Mercurius {

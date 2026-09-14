@@ -173,7 +173,7 @@ namespace fnb {
     Simulation& operator=(Simulation&&) noexcept;
     ~Simulation();
 
-    void step(double dt);
+    double step(double dt);
     void steps(size_t n, std::optional<double> dt_ = std::optional<double>{}) {
       double step_size = dt_.value_or(dt);
       for (size_t i = 0; i < n; ++i) step(step_size);
