@@ -7,6 +7,7 @@
 
 #include "particle.hpp"
 #include <cstdint>
+#include <functional>
 
 namespace fnb {
   enum class GravityMethod : uint8_t { NONE, BASIC, JACOBI, COMPENSATED };
@@ -44,8 +45,16 @@ namespace fnb {
   };
 
   class Mercurius {
+  private:
+    ParticleStore p_h_;
   public:
+    double r_crit = 3.;
+    std::function<double(const ParticleStore&, double, double)> switching_function = heaviside;
     void step(ParticleStore& particles, double dt);
+
+    static double heaviside(const ParticleStore&, double r, double r_crit) {
+      return r < r_crit ? 0. : 1.;
+    }
   };
 } // namespace fnb
 
