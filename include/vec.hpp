@@ -26,28 +26,28 @@ namespace fnb {
     constexpr explicit Vec3(double x_) : x(x_) {}
     constexpr Vec3(double x_, double y_, double z_) : x(x_), y(y_), z(z_) {}
 
-    inline Vec3& operator+=(Vec3 other) {
+    constexpr inline Vec3& operator+=(Vec3 other) {
       x += other.x;
       y += other.y;
       z += other.z;
       return *this;
     }
 
-    inline Vec3& operator-=(Vec3 other) {
+    constexpr inline Vec3& operator-=(Vec3 other) {
       x -= other.x;
       y -= other.y;
       z -= other.z;
       return *this;
     }
 
-    inline Vec3& operator*=(double other) {
+    constexpr inline Vec3& operator*=(double other) {
       x *= other;
       y *= other;
       z *= other;
       return *this;
     }
 
-    inline Vec3& operator/=(double other) {
+    constexpr inline Vec3& operator/=(double other) {
       double inv = 1. / other;
       operator*=(inv);
       return *this;
