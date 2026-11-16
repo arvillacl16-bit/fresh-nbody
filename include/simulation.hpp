@@ -6,6 +6,7 @@
 #define SIMULATION_HPP_
 
 #include "integrator.hpp"
+#include "collisions.hpp"
 #include "particle.hpp"
 #include <cstdint>
 #include <functional>
@@ -41,6 +42,8 @@ namespace fnb {
         Mercurius mercurius_;
         NoIntegration nointeg_;
       };
+
+      CollisionType collision_type;
 
     public:
       IntegratorConfig() : type_(IntegratorType::NONE), nointeg_{} {}

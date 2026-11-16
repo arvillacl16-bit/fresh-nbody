@@ -16,6 +16,7 @@ namespace fnb {
   struct IndParticle {
     Vec3 pos;
     Vec3 vel;
+    double r = 0;
     double mu = 0;
     uint64_t id;
     bool is_test = false;
@@ -91,6 +92,7 @@ namespace fnb {
     SyncStore<Vec3> velocities;
     SyncStore<Vec3> accelerations;
     SyncStore<double> mus;
+    SyncStore<double> radii;
     SyncStore<uint64_t> ids;
 
     template <typename T> SyncStore<T>& get(std::string_view) { static_assert(sizeof(T) == 0, "Invalid type"); }

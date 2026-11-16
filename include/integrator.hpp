@@ -23,10 +23,10 @@ namespace fnb {
   class WHFast {
   private:
     ParticleStore p_j;
+
   public:
     GravityMethod gravity = GravityMethod::BASIC;
     double epsilon = 1e-12;
-
 
     void step(ParticleStore& particles, double dt);
   };
@@ -37,6 +37,7 @@ namespace fnb {
     std::vector<Vec3> y0_, v0_, a0_;
     std::vector<Vec3> a_sub_, g_;
     std::vector<Vec3> current_accs_;
+
   public:
     unsigned int max_iterations = 12;
     double epsilon = 1e-12;
@@ -47,14 +48,12 @@ namespace fnb {
   class Mercurius {
   private:
     ParticleStore p_h_;
+
   public:
     double r_crit = 3.;
-    std::function<double(const ParticleStore&, double, double)> switching_function = heaviside;
+    GravityMethod gravity = GravityMethod::BASIC;
+    double epsilon = 1e-12;
     void step(ParticleStore& particles, double dt);
-
-    static double heaviside(const ParticleStore&, double r, double r_crit) {
-      return r < r_crit ? 0. : 1.;
-    }
   };
 } // namespace fnb
 
